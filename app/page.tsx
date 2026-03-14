@@ -1,3 +1,4 @@
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -5,13 +6,13 @@ export default function Home() {
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black/50 z-0"></div>
       <div className="relative z-10">
-      {/* Navigation */}
+
       {/* Hero Section */}
       <main className="container mx-auto px-6 py-16">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
             Unlimited
-            <span className="text-red-500"> Movies</span>,
+            <span className="text-[#006eeb]"> Movies</span>,
             <br />
             TV Shows & More
           </h1>
@@ -28,7 +29,7 @@ export default function Home() {
                 placeholder="Search for movies, TV shows..."
                 className="w-full px-6 py-4 rounded-lg bg-white/10 backdrop-blur-sm text-white placeholder-gray-400 border border-white/20 focus:outline-none focus:ring-2 focus:ring-red-500"
               />
-              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-md transition-colors">
+              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-color btn-hover text-white p-2 rounded-md transition-colors">
                 🔍
               </button>
             </div>
@@ -36,7 +37,7 @@ export default function Home() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105">
+            <button className="btn-color btn-hover text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105">
               Start Free Trial
             </button>
             <button className="border border-white/30 hover:bg-white/10 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all">
@@ -70,21 +71,21 @@ export default function Home() {
         {/* Features Section */}
         <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center">
-            <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 btn-color rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-white text-2xl">📱</span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Watch Everywhere</h3>
             <p className="text-gray-300">Stream on your phone, tablet, laptop, and TV without paying more.</p>
           </div>
           <div className="text-center">
-            <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 btn-color rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-white text-2xl">⬇️</span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Download & Go</h3>
             <p className="text-gray-300">Download your favorites to watch offline on the go.</p>
           </div>
           <div className="text-center">
-            <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 btn-color rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-white text-2xl">🎭</span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Unlimited Entertainment</h3>
