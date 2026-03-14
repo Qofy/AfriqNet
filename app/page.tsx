@@ -22,14 +22,14 @@ export default function Home() {
            <span className="text-white text-xl font-bold">K2MovieStreams</span> *
         </div>
         <div className="hidden md:flex space-x-8">
-          <a href="#" className="text-white hover:text-red-400 transition-colors">Home</a>
-          <a href="#" className="text-white hover:text-red-400 transition-colors">Movies</a>
-          <a href="#" className="text-white hover:text-red-400 transition-colors">TV Shows</a>
-          <a href="#" className="text-white hover:text-red-400 transition-colors">Genres</a>
+          <Link href="/home" className="text-white hover:text-red-400 transition-colors">Home</Link>
+          <Link href="movies" className="text-white hover:text-red-400 transition-colors">Movies</Link>
+          <Link href="tvShows" className="text-white hover:text-red-400 transition-colors">TV Shows</Link>
+          <Link href="genres" className="text-white hover:text-red-400 transition-colors">Genres</Link>
         </div>
-        <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors">
+        <Link href="/signIn" className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors">
           Sign In
-        </button>
+        </Link>
       </nav>
 
       {/* Hero Section */}
