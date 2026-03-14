@@ -5,6 +5,12 @@
   --foreground: #171717;
 }
 
+/* Button color variables (named as requested) */
+:root {
+  --btn-color: #006eeb; /* btn color */
+  --btn-hover: #589be8; /* btn hover */
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -23,4 +29,14 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Utility classes: only apply colors — use together for hover effect */
+.btn-color {
+  background-color: var(--btn-color) !important;
+  color: inherit; /* do not force text color here */
+}
+
+.btn-hover:hover {
+  background-color: var(--btn-hover) !important;
 }

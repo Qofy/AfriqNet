@@ -32,13 +32,13 @@ export default function GeneralHeader(){
       </div>
 
       <div className="hidden md:flex space-x-8">
-        <Link href="/home" className="text-white hover:text-red-400 transition-colors">Home</Link>
-        <Link href="/movies" className="text-white hover:text-red-400 transition-colors">Movies</Link>
-        <Link href="/tvShows" className="text-white hover:text-red-400 transition-colors">TV Shows</Link>
-        <Link href="/genres" className="text-white hover:text-red-400 transition-colors">Genres</Link>
+        <Link href="/home" className="text-white hover:text-[#589be8] transition-colors">Home</Link>
+        <Link href="/movies" className="text-white hover:text-[#589be8] transition-colors">Movies</Link>
+        <Link href="/tvShows" className="text-white hover:text-[#589be8] transition-colors">TV Shows</Link>
+        <Link href="/genres" className="text-white hover:text-[#589be8]transition-colors">Genres</Link>
       </div>
 
-      <Link href="/signIn" className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors">
+      <Link href="/signIn" className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors">
         Sign In
       </Link>
     </nav>
