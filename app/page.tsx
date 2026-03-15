@@ -1,7 +1,10 @@
-// import Image from "next/image";
-
+import Image from "next/image";
+import { Search, Clapperboard, Star, Smartphone, Download, Drama} from "lucide-react";
+import FeaturedMovies from "@/lib/utilities"
 
 export default function Home() {
+  const fm =FeaturedMovies()
+  // console.log(fm)
   return (
     <div className="min-h-screen bg-cover bg-center bg-no-repeat relative" style={{backgroundImage: 'url(/images/cover.png)'}}>
       {/* Background overlay for better text readability */}
@@ -31,7 +34,7 @@ export default function Home() {
                 className="w-full px-6 py-4 rounded-lg bg-white/10 backdrop-blur-sm text-white placeholder-gray-400 border border-white/20 focus:outline-none focus:ring-2 focus:ring-red-500"
               />
               <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-color btn-hover text-white p-2 rounded-md transition-colors">
-                🔍
+                <Search/>
               </button>
             </div>
           </div>
@@ -51,17 +54,33 @@ export default function Home() {
         <div className="mt-20">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">Featured Movies</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden hover:transform hover:scale-105 transition-all cursor-pointer">
-                <div className="h-64 bg-gradient-to-br from-red-500 to-purple-600 flex items-center justify-center">
-                  <span className="text-white text-4xl">🎬</span>
+            {fm.map((movie) => (
+              <div key={movie?.id ?? Math.random()} className="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden hover:transform hover:scale-105 transition-all cursor-pointer">
+                <div className="h-100 bg-gradient-to-br from-[#38cff0] to-[#039aec] flex items-center justify-center relative overflow-hidden">
+                  {movie ? (
+                    // If the movie has an image path, render with Next/Image using `fill` so we don't need explicit width/height
+                    movie.poster || movie.backdrop ? (
+                      <Image
+                        src={movie.poster ?? movie.backdrop}
+                        alt={movie.title ?? 'Movie poster'}
+                        fill
+                        className="object-cover object-center"
+                        priority={false}
+                      />
+                    ) : (
+                      <Clapperboard className="text-white" />
+                    )
+                  ) : (
+                    <Clapperboard className="text-white" />
+                  )}
                 </div>
+
                 <div className="p-4">
-                  <h3 className="text-white font-semibold mb-2">Featured Movie {item}</h3>
-                  <p className="text-gray-300 text-sm">Action • Adventure • 2024</p>
+                  <h3 className="text-white font-semibold mb-2">{movie?.title ?? 'Untitled'}</h3>
+                  <p className="text-gray-300 text-sm">• {movie.type} • {movie?.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}</p>
                   <div className="flex items-center mt-2">
-                    <span className="text-yellow-400">⭐</span>
-                    <span className="text-white ml-1 text-sm">8.{item}</span>
+                    <Star size={16} color="yellow" fill="yellow"/>
+                    <span className="text-white ml-1 text-sm">{movie?.rating ?? '—'}</span>
                   </div>
                 </div>
               </div>
@@ -73,21 +92,21 @@ export default function Home() {
         <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center">
             <div className="w-16 h-16 btn-color rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white text-2xl">📱</span>
+              <Smartphone/>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Watch Everywhere</h3>
             <p className="text-gray-300">Stream on your phone, tablet, laptop, and TV without paying more.</p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 btn-color rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white text-2xl">⬇️</span>
+             <Download/>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Download & Go</h3>
             <p className="text-gray-300">Download your favorites to watch offline on the go.</p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 btn-color rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white text-2xl">🎭</span>
+              <Drama/>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Unlimited Entertainment</h3>
             <p className="text-gray-300">Thousands of movies and TV shows with new content added regularly.</p>
@@ -98,7 +117,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-black/50 backdrop-blur-sm mt-24 py-8">
         <div className="container mx-auto px-6 text-center">
-          <p className="text-gray-400">© 2024 MovieStream. All rights reserved.</p>
+          <p className="text-gray-400">© 2026 MovieStream. All rights reserved.</p>
         </div>
       </footer>
       </div>
