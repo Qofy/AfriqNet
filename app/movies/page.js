@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Search, Star, Clapperboard, SlidersHorizontal } from "lucide-react";
+import { Star, Clapperboard, SlidersHorizontal } from "lucide-react";
+import SearchBar from "@/component/Search";
 import { sampleMovies, genres } from "@/component/data/sampleData";
 
 const movieGenres = genres.movie;
@@ -31,19 +32,7 @@ export default function MoviesPage() {
           </p>
 
           {/* Search */}
-          <div className="relative mt-6 max-w-lg">
-            <input
-              type="text"
-              placeholder="Search movies..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-5 py-3 pr-12 rounded-lg bg-white/10 text-white placeholder-[#a2cbf9] border border-[#a2cbf9]/30 focus:outline-none focus:ring-2 focus:ring-[#006eeb]"
-            />
-            <Search
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a2cbf9]"
-              size={18}
-            />
-          </div>
+          <SearchBar value={search} onChange={(v) => setSearch(v)} />
         </div>
       </div>
 
