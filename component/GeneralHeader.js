@@ -32,7 +32,7 @@ export default function GeneralHeader(){
       </div>
 
       <div className="hidden md:flex space-x-8">
-        <Link href="/home" className="text-white hover:text-[#589be8] transition-colors">Home</Link>
+        <Link href="/" className="text-white hover:text-[#589be8] transition-colors">Home</Link>
         <Link href="/movies" className="text-white hover:text-[#589be8] transition-colors">Movies</Link>
         <Link href="/tvShows" className="text-white hover:text-[#589be8] transition-colors">TV Shows</Link>
         <Link href="/genres" className="text-white hover:text-[#589be8]transition-colors">Genres</Link>
