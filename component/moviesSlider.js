@@ -100,7 +100,7 @@ export default function MovieSlider({ movies = sampleMovies }) {
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex items-center">
+      <div className="relative h-full flex items-center mt-12">
         <div className="container mx-auto px-6 md:px-12 max-w-7xl">
           <div
             className={`max-w-2xl transition-all duration-500 ${
