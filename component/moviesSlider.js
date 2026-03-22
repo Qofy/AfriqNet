@@ -74,7 +74,7 @@ export default function MovieSlider({ movies = sampleMovies }) {
   const currentMovie = movies[currentIndex];
 
   return (
-    <div className="relative w-full h-200  md:h-190 overflow-hidden group">
+    <div className="relative w-full h-250  md:h-190 overflow-hidden group">
       {/* Background Image with Overlay */}
       <div
         className={`absolute inset-0 transition-opacity duration-500 ${
