@@ -1,10 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Star, Play, Plus, Info } from "lucide-react";
 import { sampleMovies } from "@/component/data/sampleData";
 
 
 export const MovieCard = ({ movie }) => (
-  <div className="shrink-0 w-48 group cursor-pointer">
+  <Link href={`/detail?id=${movie.id}`} className="shrink-0 w-48 group cursor-pointer block">
     <div className="relative h-72 rounded-lg overflow-hidden bg-linear-to-br from-[#38cff0] to-[#039aec] transition-all transform group-hover:scale-105">
       {movie.poster ? (
         <Image
@@ -49,5 +50,5 @@ export const MovieCard = ({ movie }) => (
         {movie.release_date ? new Date(movie.release_date).getFullYear() : "N/A"}
       </p>
     </div>
-  </div>
+  </Link>
 );
