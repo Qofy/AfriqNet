@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Star, Clapperboard, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
 import { sampleMovies, genres } from "@/component/data/sampleData";
@@ -77,9 +78,10 @@ export default function MoviesPage() {
         {filtered.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {filtered.map((movie) => (
-              <div
+              <Link
                 key={movie.id}
-                className="group cursor-pointer rounded-lg overflow-hidden bg-white/5 hover:bg-white/10 transition-all hover:scale-105"
+                href={`/detail?id=${movie.id}`}
+                className="group cursor-pointer rounded-lg overflow-hidden bg-white/5 hover:bg-white/10 transition-all hover:scale-105 block"
               >
                 {/* Poster */}
                 <div className="relative h-64 bg-linear-to-br from-[#38cff0] to-[#039aec]">
@@ -119,7 +121,7 @@ export default function MoviesPage() {
                     {movie.tagline}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
