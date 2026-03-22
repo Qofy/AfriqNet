@@ -31,6 +31,15 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Hide native scrollbars for horizontal lists (used across the app) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Utility classes: only apply colors — use together for hover effect */
 .btn-color {
   background-color: var(--btn-color) !important;
