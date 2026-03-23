@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { Play, Plus, Share2, Star, Clock, Calendar } from "lucide-react";
+import { Play, Share2, Star, Clock, Calendar } from "lucide-react";
+import WatchlistButton from "./WatchlistButton";
 
 export const MovieHero = ({ movie }) => {
   return (
@@ -87,10 +88,7 @@ export const MovieHero = ({ movie }) => {
                   <Play size={24} fill="white" />
                   Play Now
                 </button>
-                <button className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-4 rounded-lg font-semibold flex items-center gap-3 transition-all">
-                  <Plus size={24} />
-                  Add to Watchlist
-                </button>
+                <WatchlistButton movieId={movie.id} />
                 <button className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-4 rounded-lg transition-all" aria-label="Share">
                   <Share2 size={24} />
                 </button>
