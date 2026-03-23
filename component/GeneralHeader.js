@@ -28,7 +28,7 @@ export default function GeneralHeader(){
             className="object-cover object-center"
           />
         </Link>
-        <span className="text-white text-xl font-bold">K2MovieStreams</span>
+        {/* <span className="text-white text-xl font-bold">K2MovieStreams</span> */}
       </div>
 
       <div className="hidden md:flex space-x-8">
