@@ -6,6 +6,13 @@ import { useEffect, useState } from "react";
 
 export default function GeneralHeader(){
   const [scrolled, setScrolled] = useState(false);
+  const links = [
+    {id:0 ,link: "/home", tag:"Home"},
+    {id:1 ,link:"/movies", tag:"Movies"},
+    {id:2 ,link:"/tvShows", tag:"Tv Shows"},
+    {id:3 ,link:"/genres", tage:"Genres"},
+    {id:4 ,link:"/musicVideos", tag:"Music Videos"}
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -32,10 +39,9 @@ export default function GeneralHeader(){
       </div>
 
       <div className="hidden md:flex space-x-8">
-        <Link href="/home" className="text-white hover:text-[#589be8] transition-colors">Home</Link>
-        <Link href="/movies" className="text-white hover:text-[#589be8] transition-colors">Movies</Link>
-        <Link href="/tvShows" className="text-white hover:text-[#589be8] transition-colors">TV Shows</Link>
-        <Link href="/genres" className="text-white hover:text-[#589be8]transition-colors">Genres</Link>
+        {links.map(link=>(
+          <Link href={link.link} key={link.id}>{link.tag}</Link>
+        ))}
       </div>
 
       <Link href="/signIn" className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors">
