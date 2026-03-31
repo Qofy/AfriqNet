@@ -10,7 +10,7 @@ export default function GeneralHeader(){
     {id:0 ,link: "/home", tag:"Home"},
     {id:1 ,link:"/movies", tag:"Movies"},
     {id:2 ,link:"/tvShows", tag:"Tv Shows"},
-    {id:3 ,link:"/genres", tage:"Genres"},
+    {id:3 ,link:"/genres", tag:"Genres"},
     {id:4 ,link:"/musicVideos", tag:"Music Videos"}
   ]
 
