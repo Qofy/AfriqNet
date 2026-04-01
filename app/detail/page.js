@@ -1,4 +1,4 @@
-import { sampleMovies } from "@/component/data/sampleData";
+import { sampleMovies, sampleTVShows } from "@/component/data/sampleData";
 import { MovieRow } from "@/component/movieRow";
 import { MovieHero } from "@/component/MovieHero";
 import DetailTabs from "@/component/DetailTabs";
@@ -7,8 +7,9 @@ export default async function DetailPage({ searchParams }) {
   const params = await searchParams;
   const movieId = params?.id;
 
-  // Find the movie by ID from URL params
-  const movie = sampleMovies.find((m) => m.id === movieId) || sampleMovies[0];
+  // Find the content by ID from URL params (search both movies and TV shows)
+  const allContent = [...sampleMovies, ...sampleTVShows];
+  const movie = allContent.find((item) => item.id === movieId) || sampleMovies[0];
 
   // Related/similar movies
   const relatedMovies = sampleMovies.slice(1, 7);
