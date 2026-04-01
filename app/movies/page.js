@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Star, Clapperboard, SlidersHorizontal } from "lucide-react";
+import { Clapperboard, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
 import { sampleMovies, genres } from "@/component/data/sampleData";
+import MoviesGrid from "@/component/MoviesGrid";
 
 const movieGenres = genres.movie;
 
@@ -76,54 +75,7 @@ export default function MoviesPage() {
 
         {/* Movie Grid */}
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-            {filtered.map((movie) => (
-              <Link
-                key={movie.id}
-                href={`/detail?id=${movie.id}`}
-                className="group cursor-pointer rounded-lg overflow-hidden bg-white/5 hover:bg-white/10 transition-all hover:scale-105 block"
-              >
-                {/* Poster */}
-                <div className="relative h-64 bg-linear-to-br from-[#38cff0] to-[#039aec]">
-                  {movie.poster ? (
-                    <Image
-                      src={movie.poster}
-                      alt={movie.title}
-                      fill
-                      className="object-cover object-center"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <Clapperboard className="text-white" size={40} />
-                    </div>
-                  )}
-                  {/* Rating badge */}
-                  <div className="absolute top-2 right-2 bg-[#006eeb]/90 backdrop-blur-sm rounded px-2 py-0.5 flex items-center gap-1">
-                    <Star size={11} color="gold" fill="gold" />
-                    <span className="text-white text-xs font-medium">
-                      {movie.rating}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Info */}
-                <div className="p-3">
-                  <h3 className="text-white font-semibold text-sm leading-tight line-clamp-2 mb-1">
-                    {movie.title}
-                  </h3>
-                  <p className="text-[#a2cbf9] text-xs">
-                    {movie.release_date
-                      ? new Date(movie.release_date).getFullYear()
-                      : "N/A"}{" "}
-                    · {movie.runtime} min
-                  </p>
-                  <p className="text-[#a2cbf9]/60 text-xs mt-1 italic line-clamp-1">
-                    {movie.tagline}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <MoviesGrid movies={filtered} />
         ) : (
           <div className="text-center py-24">
             <Clapperboard size={48} className="text-[#fd536a]/50 mx-auto mb-4" />

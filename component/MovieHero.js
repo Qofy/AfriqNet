@@ -9,10 +9,11 @@ export const MovieHero = ({ movie }) => {
         <>
           <Image
             src={movie.backdrop}
-            alt={movie.title}
+            alt={movie.title || movie.name}
             fill
             priority
             className="object-cover object-center"
+      
           />
           {/* Gradient Overlays */}
           <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-transparent"></div>
@@ -32,7 +33,7 @@ export const MovieHero = ({ movie }) => {
                 {movie.poster ? (
                   <Image
                     src={movie.poster}
-                    alt={movie.title}
+                    alt={movie.title||movie.name}
                     fill
                     className="object-cover"
                   />
@@ -47,7 +48,7 @@ export const MovieHero = ({ movie }) => {
             {/* Title and Actions */}
             <div className="flex-1">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg">
-                {movie.title}
+                {movie.title || movie.name}
               </h1>
 
               {/* Meta Info */}
@@ -58,20 +59,20 @@ export const MovieHero = ({ movie }) => {
                     <span className="font-semibold text-lg">{movie.rating}</span>
                   </div>
                 )}
-                {movie.release_date && (
+                {(movie.release_date || movie.first_air_date) && (
                   <div className="flex items-center gap-2">
                     <Calendar size={16} />
-                    <span>{new Date(movie.release_date).getFullYear()}</span>
+                    <span>{new Date(movie.release_date || movie.first_air_date).getFullYear()}</span>
                   </div>
                 )}
-                {movie.runtime && (
+                {(movie.runtime || movie.number_of_seasons) && (
                   <div className="flex items-center gap-2">
                     <Clock size={16} />
-                    <span>{movie.runtime} min</span>
+                    <span>{movie.runtime ? `${movie.runtime} min` : `${movie.number_of_seasons} seasons`}</span>
                   </div>
                 )}
                 <span className="px-3 py-1 bg-white/10 rounded-full text-sm">
-                  {movie.type || "Movie"}
+                  {movie.type === 'tv' ? 'TV Show' : movie.type || 'Movie'}
                 </span>
               </div>
 
