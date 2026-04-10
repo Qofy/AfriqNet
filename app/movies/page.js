@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { Clapperboard, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
 import { sampleMovies, genres } from "@/component/data/sampleData";
@@ -9,8 +10,16 @@ import MoviesGrid from "@/component/MoviesGrid";
 const movieGenres = genres.movie;
 
 export default function MoviesPage() {
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
-  const [activeGenre, setActiveGenre] = useState(null);
+  
+  // Get initial genre from URL query parameter
+  const initialGenre = useMemo(() => {
+    const genreParam = searchParams.get('genre');
+    return genreParam ? parseInt(genreParam) : null;
+  }, [searchParams]);
+  
+  const [activeGenre, setActiveGenre] = useState(initialGenre);
 
   const filtered = sampleMovies.filter((movie) => {
     const matchesSearch = movie.title
