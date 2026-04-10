@@ -6,9 +6,9 @@ import { ChevronLeft, ChevronRight, Play, Info, Star } from "lucide-react";
 import { sampleMovies } from "@/component/data/sampleData";
 
 export default function MovieSlider({ movies = sampleMovies }) {
-  const [currentIndex, setCurrentIndex] = useState(() => 
-    movies.length > 0 ? Math.floor(Math.random() * movies.length) : 0
-  );
+  // Use a deterministic initial index for SSR (avoids hydration mismatch).
+  // Pick a random slide only on the client after mount.
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const [fade, setFade] = useState(true);
 
@@ -35,6 +35,16 @@ export default function MovieSlider({ movies = sampleMovies }) {
 
     return () => clearInterval(interval);
   }, [isAutoPlay, movies.length, getRandomIndex]);
+
+  // On client mount, choose a random initial slide once to avoid
+  // server/client markup differences that cause hydration errors.
+  useEffect(() => {
+    if (movies.length === 0) return;
+    // Choose a random index different from the current (0) when possible
+    const idx = getRandomIndex(currentIndex);
+    if (idx !== currentIndex) setCurrentIndex(idx);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const goToNext = () => {
     setIsAutoPlay(false);

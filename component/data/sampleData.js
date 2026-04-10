@@ -501,3 +501,160 @@ export const sampleReviews = [
     created_at: "2024-01-15"
   }
 ];
+
+export const musicVideoGenres = [
+  { id: 1, name: "Afrobeats" },
+  { id: 2, name: "Hip Hop" },
+  { id: 3, name: "R&B" },
+  { id: 4, name: "Gospel" },
+  { id: 5, name: "Highlife" },
+  { id: 6, name: "Amapiano" },
+  { id: 7, name: "Dancehall" },
+  { id: 8, name: "Reggae" },
+  { id: 9, name: "Pop" },
+  { id: 10, name: "Soul" },
+  {id:11, name:"Rap"}
+];
+
+export const sampleMusicVideos = [
+  {
+    id: "mv1",
+    title: "Lagos Nights",
+    artist: "Wizkid",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&q=80",
+    rating: 9.2,
+    release_date: "2024-03-15",
+    overview: "An energetic Afrobeats anthem celebrating the vibrant nightlife of Lagos. Stunning visuals showcase the city's culture and energy.",
+    genre_ids: [1, 9],
+    duration: "3:45",
+    views: "15.2M"
+  },
+  {
+    id: "mv2",
+    title: "African Queen",
+    artist: "Burna Boy",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80",
+    rating: 9.5,
+    release_date: "2024-02-20",
+    overview: "A powerful fusion of traditional African sounds and modern production. The video features breathtaking cinematography across various African landscapes.",
+    genre_ids: [1, 8],
+    duration: "4:12",
+    views: "22.8M"
+  },
+  {
+    id: "mv3",
+    title: "Ghana Vibes",
+    artist: "Sarkodie ft. King Promise",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1920&q=80",
+    rating: 8.8,
+    release_date: "2024-01-10",
+    overview: "A celebration of Ghanaian culture with infectious beats and colorful visuals. The collaboration brings together two of Ghana's finest artists.",
+    genre_ids: [2, 5],
+    duration: "3:28",
+    views: "18.5M"
+  },
+  {
+    id: "mv4",
+    title: "Amapiano Fever",
+    artist: "DJ Maphorisa & Kabza De Small",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1920&q=80",
+    rating: 9.0,
+    release_date: "2023-12-28",
+    overview: "The kings of Amapiano deliver another hit with hypnotic rhythms and smooth production. Shot in the heart of Johannesburg's music scene.",
+    genre_ids: [6],
+    duration: "4:35",
+    views: "25.1M"
+  },
+  {
+    id: "mv5",
+    title: "Soulful Journey",
+    artist: "Asa",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1458560871784-56d23406c091?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1458560871784-56d23406c091?w=1920&q=80",
+    rating: 8.7,
+    release_date: "2024-02-05",
+    overview: "An intimate and soulful performance that showcases Asa's incredible vocal range and emotional depth. Minimalist visuals that let the music speak.",
+    genre_ids: [3, 10],
+    duration: "3:52",
+    views: "12.3M"
+  },
+  {
+    id: "mv6",
+    title: "Blessed",
+    artist: "Nathaniel Bassey",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1415886541506-6efc5e4b1786?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1415886541506-6efc5e4b1786?w=1920&q=80",
+    rating: 9.3,
+    release_date: "2024-01-01",
+    overview: "An uplifting gospel anthem with powerful vocals and inspiring visuals. Perfect for worship and meditation.",
+    genre_ids: [4],
+    duration: "5:20",
+    views: "30.5M"
+  },
+  {
+    id: "mv7",
+    title: "Island Rhythm",
+    artist: "Stonebwoy",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&q=80",
+    rating: 8.9,
+    release_date: "2023-11-15",
+    overview: "A reggae-dancehall fusion that brings Caribbean vibes to West Africa. Shot on beautiful tropical beaches with stunning sunset scenes.",
+    genre_ids: [7, 8],
+    duration: "3:35",
+    views: "16.7M"
+  },
+  {
+    id: "mv8",
+    title: "Street Symphony",
+    artist: "Olamide",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=1920&q=80",
+    rating: 8.6,
+    release_date: "2024-03-01",
+    overview: "Raw and authentic hip-hop from the streets of Lagos. Olamide delivers hard-hitting bars over a trap-influenced beat.",
+    genre_ids: [2],
+    duration: "3:15",
+    views: "20.2M"
+  },
+  {
+    id: "mv9",
+    title: "Love & Light",
+    artist: "Tiwa Savage",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1499364615650-ec38552f4f34?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1499364615650-ec38552f4f34?w=1920&q=80",
+    rating: 9.1,
+    release_date: "2024-02-14",
+    overview: "A romantic R&B ballad with elegant choreography and luxurious visuals. Tiwa Savage at her finest.",
+    genre_ids: [3, 9],
+    duration: "4:05",
+    views: "19.8M"
+  },
+  {
+    id: "mv10",
+    title: "Heritage",
+    artist: "M.anifest",
+    type: "Music Video",
+    poster: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=500&q=80",
+    backdrop: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1920&q=80",
+    rating: 8.5,
+    release_date: "2023-10-20",
+    overview: "A thoughtful exploration of African heritage through hip-hop. Features traditional instruments blended with modern production.",
+    genre_ids: [2, 5],
+    duration: "4:28",
+    views: "11.4M"
+  }
+];

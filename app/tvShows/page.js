@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, SlidersHorizontal } from "lucide-react";
@@ -11,8 +12,16 @@ import MoviesGrid from "../../component/MoviesGrid";
 const tvGenres = genres.tv;
 
 export default function TvShows() {
+    const searchParams = useSearchParams();
     const [search, setSearch] = useState("");
-    const [activeGenre, setActiveGenre] = useState(null);
+    
+    // Get initial genre from URL query parameter
+    const initialGenre = useMemo(() => {
+        const genreParam = searchParams.get('genre');
+        return genreParam ? parseInt(genreParam) : null;
+    }, [searchParams]);
+    
+    const [activeGenre, setActiveGenre] = useState(initialGenre);
 
     const filtered = sampleTVShows.filter((show) => {
         const matchesSearch = (show.name || "")
