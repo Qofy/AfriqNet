@@ -46,8 +46,8 @@ export default function GeneralHeader(){
           ))}
         </div>
 
-        <Link href="/signIn" className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors">
-          Sign-up
+        <Link href="/login" className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors">
+          Sign In
         </Link>
       </nav>
 
@@ -77,7 +77,7 @@ export default function GeneralHeader(){
             <Music size={20} />
           </Link>
 
-          <Link href="/signIn" aria-label="Signup" className="flex flex-col items-center text-white text-xs">
+          <Link href="/login" aria-label="Sign In" className="flex flex-col items-center text-white text-xs">
             <User size={20} />
           </Link>
         </div>
