@@ -1,11 +1,14 @@
 import Image from "next/image";
 import { Search, Clapperboard, Star, Smartphone, Download, Drama} from "lucide-react";
 import FeaturedMovies from "@/lib/utilities"
+import GeneralHeader from "@/component/GeneralHeader";
 
 export default function Home() {
   const fm =FeaturedMovies()
   // console.log(fm)
   return (
+    <>
+    <GeneralHeader/>
     <div className="min-h-screen bg-cover bg-center bg-no-repeat relative" style={{backgroundImage: 'url(/images/cover.png)'}}>
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black/50 z-0"></div>
@@ -122,5 +125,6 @@ export default function Home() {
       </footer>
       </div>
     </div>
+    </>
   );
 }

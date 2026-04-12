@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useActionState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { signin } from "../../../actions/auth-action";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -14,25 +15,8 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [formState, formAction] = useActionState(signin,{})
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    // Email validation
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,7 +64,7 @@ export default function LoginPage() {
 
         {/* Form */}
         <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form action={formAction} className="space-y-5">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
@@ -92,10 +76,8 @@ export default function LoginPage() {
                   type="email"
                   id="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
                   className={`w-full bg-white/10 border ${
-                    errors.email ? "border-red-500" : "border-white/20"
+                    formState.errors ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="you@example.com"
                 />
@@ -124,10 +106,9 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
-                  value={formData.password}
-                  onChange={handleChange}
+                  
                   className={`w-full bg-white/10 border ${
-                    errors.password ? "border-red-500" : "border-white/20"
+                    formState.errors ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="••••••••"
                 />
@@ -157,7 +138,11 @@ export default function LoginPage() {
                 Remember me for 30 days
               </label>
             </div>
-
+               {formState.errors && (<ul id="form-error">
+                {Object.keys(formState.errors).map((error)=>(<li key={error}>
+                  {formState.errors[error]}
+                </li>))}
+              </ul>)}
             {/* Submit Button */}
             <button
               type="submit"

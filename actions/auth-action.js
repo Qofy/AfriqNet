@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { hashUserPassword } from "../lib/hashpassword";
+import { hashUserPassword, verifyPassword } from "../lib/hashpassword";
 import { createUsers } from "../lib/users";
 import getUserByEmailWrapper from "../lib/users";
 
@@ -58,4 +58,28 @@ export async function signup(prevState, formData) {
             }
         };
     }
+}
+
+export async function signin(prevState,formData) {
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    const loginExsistingUser = getUserByEmailWrapper(email);
+    if (!loginExsistingUser) {
+        return{
+            errors:{
+                email:"Could not authenticate, please check your e-mail "
+            }
+        }
+    }
+    const isValidPassword = await verifyPassword(loginExsistingUser.password, password);
+    if (!isValidPassword) {
+        return {
+            errors:{
+                email:"Could not authenticate, please check your password "
+            }
+        }
+    }
+    // await createAuthSession(loginExsistingUser.id);
+    redirect("/home")
 }
