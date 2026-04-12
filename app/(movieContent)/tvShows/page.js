@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Star, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
 import { sampleTVShows, genres } from "@/component/data/sampleData";
-import MoviesGrid from "../../component/MoviesGrid";
+import MoviesGrid from "../../../component/MoviesGrid";
 
 const tvGenres = genres.tv;
 

@@ -1,7 +1,7 @@
 import ContinueWatching from "@/component/continueWatching";
 import MovieSlider from "@/component/moviesSlider";
-import { MovieRow } from "../../component/movieRow";
-import { continueWatchingList,trendingMovies, actionMovies, newReleases, sciFiMovies } from "../../component/data/continueWatching";
+import { MovieRow } from "../../../component/movieRow";
+import { continueWatchingList,trendingMovies, actionMovies, newReleases, sciFiMovies } from "../../../component/data/continueWatching";
   import {sampleMovies} from "@/component/data/sampleData"
 
 
