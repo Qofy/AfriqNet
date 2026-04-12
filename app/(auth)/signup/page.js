@@ -1,83 +1,79 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useActionState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { signup } from "../../../actions/auth-action";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 export default function SignUpPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [formState, formAction] = useActionState(signup, {});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  // const [errors, setErrors] = useState({});
+  // const [isLoading, setIsLoading] = useState(false);
 
-  const validateForm = () => {
-    const newErrors = {};
+  // const validateForm = () => {
+  //   const newErrors = {};
 
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = "Name must be at least 2 characters";
-    }
+  //   // Name validation
+  //   if (!formData.name.trim()) {
+  //     newErrors.name = "Name is required";
+  //   } else if (formData.name.trim().length < 2) {
+  //     newErrors.name = "Name must be at least 2 characters";
+  //   }
 
-    // Email validation
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
+  //   // Email validation
+  //   if (!formData.email.trim()) {
+  //     newErrors.email = "Email is required";
+  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+  //     newErrors.email = "Please enter a valid email";
+  //   }
 
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = "Password must contain uppercase, lowercase, and number";
-    }
+  //   // Password validation
+  //   if (!formData.password) {
+  //     newErrors.password = "Password is required";
+  //   } else if (formData.password.length < 8) {
+  //     newErrors.password = "Password must be at least 8 characters";
+  //   } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+  //     newErrors.password = "Password must contain uppercase, lowercase, and number";
+  //   }
 
-    // Confirm password validation
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
+  //   // Confirm password validation
+  //   if (!formData.confirmPassword) {
+  //     newErrors.confirmPassword = "Please confirm your password";
+  //   } else if (formData.password !== formData.confirmPassword) {
+  //     newErrors.confirmPassword = "Passwords do not match";
+  //   }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({ ...prev, [name]: value }));
+  //   // Clear error for this field when user starts typing
+  //   if (errors[name]) {
+  //     setErrors((prev) => ({ ...prev, [name]: "" }));
+  //   }
+  // };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
 
-    if (!validateForm()) return;
+  //   if (!validateForm()) return;
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Sign up data:", formData);
-      setIsLoading(false);
-      // Redirect to login or home page
-      // router.push('/login');
-    }, 1500);
-  };
+  //   // Simulate API call
+  //   setTimeout(() => {
+  //     console.log("Sign up data:", formData);
+  //     setIsLoading(false);
+  //     // Redirect to login or home page
+  //     // router.push('/login');
+  //   }, 1500);
+  // };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center px-4 py-12">
@@ -100,7 +96,7 @@ export default function SignUpPage() {
 
         {/* Form */}
         <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form action={formAction} className="space-y-5">
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
@@ -112,16 +108,14 @@ export default function SignUpPage() {
                   type="text"
                   id="name"
                   name="name"
-                  value={formData.name}
-                  onChange={handleChange}
                   className={`w-full bg-white/10 border ${
-                    errors.name ? "border-red-500" : "border-white/20"
+                    formState.errors?.name ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="John Doe"
                 />
               </div>
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              {formState.errors?.name && (
+                <p className="text-red-500 text-sm mt-1">{formState.errors.name}</p>
               )}
             </div>
 
@@ -136,16 +130,14 @@ export default function SignUpPage() {
                   type="email"
                   id="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
                   className={`w-full bg-white/10 border ${
-                    errors.email ? "border-red-500" : "border-white/20"
+                    formState.errors?.email ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="you@example.com"
                 />
               </div>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              {formState.errors?.email && (
+                <p className="text-red-500 text-sm mt-1">{formState.errors.email}</p>
               )}
             </div>
 
@@ -160,10 +152,8 @@ export default function SignUpPage() {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
-                  value={formData.password}
-                  onChange={handleChange}
                   className={`w-full bg-white/10 border ${
-                    errors.password ? "border-red-500" : "border-white/20"
+                    formState.errors?.password ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="••••••••"
                 />
@@ -175,8 +165,8 @@ export default function SignUpPage() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              {formState.errors?.password && (
+                <p className="text-red-500 text-sm mt-1">{formState.errors.password}</p>
               )}
             </div>
 
@@ -191,10 +181,8 @@ export default function SignUpPage() {
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
                   name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
                   className={`w-full bg-white/10 border ${
-                    errors.confirmPassword ? "border-red-500" : "border-white/20"
+                    formState.errors?.confirm_password ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="••••••••"
                 />
@@ -206,28 +194,22 @@ export default function SignUpPage() {
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+              {formState.errors?.confirm_password && (
+                <p className="text-red-500 text-sm mt-1">{formState.errors.confirm_password}</p>
               )}
             </div>
-
+              {formState.errors && (<ul id="form-error">
+                {Object.keys(formState.errors).map((error)=>(<li key={error}>
+                  {formState.errors[error]}
+                </li>))}
+              </ul>)}
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full btn-color btn-hover text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-color btn-hover text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2"
             >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Creating Account...
-                </>
-              ) : (
-                <>
-                  Sign Up
-                  <ArrowRight size={20} />
-                </>
-              )}
+              Sign Up
+              <ArrowRight size={20} />
             </button>
           </form>
 
