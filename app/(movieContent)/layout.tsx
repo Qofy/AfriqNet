@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import GeneralHeader from "@/component/GeneralHeader.js";
-import { verifyAuth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import AuthGuard from "@/component/AuthGuard.js";
 
 export const metadata: Metadata = {
   title: "Movie Content",
@@ -14,14 +13,10 @@ export default async function AuthLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const result = await verifyAuth()
-  if(!result?.user){
-    return redirect('/')
-  }
   return (
-    <>
+    <AuthGuard>
       <GeneralHeader />
       {children}
-    </>
+    </AuthGuard>
   );
 }

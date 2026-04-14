@@ -4,7 +4,7 @@ import { useState, useActionState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
-import signin from "../../../actions/auth-action";
+import { signin } from "../../../actions/auth-action";
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",

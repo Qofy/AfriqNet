@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { hashUserPassword, verifyPassword } from "../lib/hashpassword";
 import { createUsers } from "../lib/users";
 import getUserByEmailWrapper from "../lib/users";
-import { createAuthSession } from "../lib/auth";
+import destorySession, { createAuthSession } from "../lib/auth";
 
 export async function signup(prevState, formData) {
     const users_name = formData.get("name");
@@ -49,9 +49,8 @@ export async function signup(prevState, formData) {
     const hashPassword = await hashUserPassword(password);
      
     try {
-        const id = createUsers(users_name, email, hashPassword);
-       await createAuthSession(id)
-        redirect("/login");
+        const user = createUsers(users_name, email, hashPassword);
+        await createAuthSession(user.id);
     } catch (error) {
         console.error("Signup error:", error);
         return {
@@ -60,9 +59,11 @@ export async function signup(prevState, formData) {
             }
         };
     }
+    
+    redirect("/home");
 }
 
-export default async function signin(prevState,formData) {
+export async function signin(prevState, formData) {
     const email = formData.get("email");
     const password = formData.get("password");
 
@@ -82,6 +83,11 @@ export default async function signin(prevState,formData) {
             }
         }
     }
-    // await createAuthSession(loginExsistingUser.id);
+    await createAuthSession(loginExsistingUser.id);
     redirect("/home")
+}
+
+export async function logout() {
+  await destorySession();
+  redirect("/login")
 }
