@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { hashUserPassword, verifyPassword } from "../lib/hashpassword";
 import { createUsers } from "../lib/users";
 import getUserByEmailWrapper from "../lib/users";
+import { createAuthSession } from "../lib/auth";
 
 export async function signup(prevState, formData) {
     const users_name = formData.get("name");
@@ -48,7 +49,8 @@ export async function signup(prevState, formData) {
     const hashPassword = await hashUserPassword(password);
      
     try {
-        createUsers(users_name, email, hashPassword);
+        const id = createUsers(users_name, email, hashPassword);
+       await createAuthSession(id)
         redirect("/login");
     } catch (error) {
         console.error("Signup error:", error);
@@ -60,7 +62,7 @@ export async function signup(prevState, formData) {
     }
 }
 
-export async function signin(prevState,formData) {
+export default async function signin(prevState,formData) {
     const email = formData.get("email");
     const password = formData.get("password");
 
