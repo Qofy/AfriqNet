@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Home, Film, Tv, List, Music, User } from "lucide-react";
+import { logout } from "@/actions/auth-action"
 
 export default function GeneralHeaderClient({ authverification }){
   const [scrolled, setScrolled] = useState(false);
@@ -44,9 +45,13 @@ export default function GeneralHeaderClient({ authverification }){
           ))}
         </div>
 
-        <Link href="/login" className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors">
-          {authverification? "Logout":"Sign in"}
-        </Link>
+          {authverification?.user ? (
+            <form action={logout}>
+              <button type="submit" className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors">Log out</button>
+            </form>
+          ) : (
+            <Link className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors" href="/login">Sign in</Link>
+          )}
       </nav>
 
       {/* Mobile bottom icon nav */}

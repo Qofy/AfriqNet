@@ -30,7 +30,6 @@ export default function MoviesPage() {
     return matchesSearch && matchesGenre;
   });
 
-  verify
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
