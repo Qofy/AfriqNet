@@ -1,42 +1,23 @@
-  import {sampleMovies} from "@/component/data/sampleData"
-  // Sample continue watching data
-  export const continueWatchingList = [
-    {
-      id: "cw1",
-      title: "Quantum Nexus",
-      backdrop: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80",
-      progress: 65,
-      year: 2024,
-      timeLeft: "45 min"
-    },
-    {
-      id: "cw2",
-      title: "The Last Horizon",
-      backdrop: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80",
-      progress: 30,
-      year: 2023,
-      timeLeft: "1h 50min"
-    },
-    {
-      id: "cw3",
-      title: "Shadow Protocol",
-      backdrop: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&q=80",
-      progress: 80,
-      year: 2024,
-      timeLeft: "20 min"
-    },
-    {
-      id: "cw4",
-      title: "Eternal Echoes",
-      backdrop: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800&q=80",
-      progress: 15,
-      year: 2023,
-      timeLeft: "2h 5min"
-    }
-  ];
+  import { getAllMovies } from "@/lib/db.server";
+
+  // Use the DB-backed movies list to build demo lists used in the UI.
+  const _movies = getAllMovies();
+
+  // Build a small continue-watching list from the top movies (deterministic values)
+  const defaultProgress = [65, 30, 80, 15];
+  const defaultTimeLeft = ["45 min", "1h 50min", "20 min", "2h 5min"];
+
+  export const continueWatchingList = _movies.slice(0, 4).map((m, i) => ({
+    id: `cw${i + 1}`,
+    title: m.title || m.name,
+    backdrop: m.backdrop || m.poster || "",
+    progress: defaultProgress[i] ?? Math.min(95, Math.max(5, Math.floor((m.rating || 5) * 10))),
+    year: (m.release_date || m.first_air_date || "").split("-")[0] || null,
+    timeLeft: defaultTimeLeft[i] || "45 min"
+  }));
 
   // Get different categories
- export const trendingMovies = sampleMovies.slice(0, 6);
-  export const actionMovies = sampleMovies.filter(m => m.genre_ids.includes(28)).slice(0, 6);
-  export const sciFiMovies = sampleMovies.filter(m => m.genre_ids.includes(878)).slice(0, 6);
-  export const newReleases = sampleMovies.slice(10, 16);
+  export const trendingMovies = _movies.slice(0, 6);
+  export const actionMovies = _movies.filter(m => (m.genre_ids || []).includes(28)).slice(0, 6);
+  export const sciFiMovies = _movies.filter(m => (m.genre_ids || []).includes(878)).slice(0, 6);
+  export const newReleases = _movies.slice(10, 16);
