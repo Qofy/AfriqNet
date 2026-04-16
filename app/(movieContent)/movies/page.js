@@ -4,8 +4,14 @@ import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Clapperboard, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
-import { sampleMovies, genres } from "@/component/data/sampleData";
+// import { sampleMovies, genres } from "@/component/data/sampleData";
 import MoviesGrid from "@/component/MoviesGrid";
+import { getAllGenres, getAllMovies } from "../../../lib/db.server";
+
+  const genres = getAllGenres();
+  if(!genres){
+    throw new Error("Somthing went wrong, we are unable to load genres")
+  }
 
 const movieGenres = genres.movie;
 
@@ -30,6 +36,10 @@ export default function MoviesPage() {
     return matchesSearch && matchesGenre;
   });
 
+  const sampleMovies =getAllMovies();
+  if (!sampleMovies){
+    throw new Error("Loading sample movies failed!, Please try again later")
+  }
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
