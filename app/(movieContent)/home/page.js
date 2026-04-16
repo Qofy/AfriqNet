@@ -2,13 +2,18 @@ import ContinueWatching from "@/component/continueWatching";
 import MovieSlider from "@/component/moviesSlider";
 import { MovieRow } from "../../../component/movieRow";
 import { continueWatchingList,trendingMovies, actionMovies, newReleases, sciFiMovies } from "../../../component/data/continueWatching";
-import {sampleMovies} from "@/component/data/sampleData"
+// import {sampleMovies} from "@/component/data/sampleData"
+import { getAllMovies } from "../../../lib/db.server";
   
 
 
 
 
 export default function HomePage() {
+  const sampleMovies = getAllMovies();
+  if(!sampleMovies){
+     throw new Error ("Something went wrong! Unable to load movies")
+  }
 
   return (
     <div className="min-h-screen bg-black">
