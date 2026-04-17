@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Home, Film, Tv, List, Music, User } from "lucide-react";
+import { Home, Film, Tv, List, Music, User, Camera } from "lucide-react";
 import { logout } from "@/actions/auth-action"
 
 export default function GeneralHeaderClient({ authverification }){
@@ -41,17 +41,22 @@ export default function GeneralHeaderClient({ authverification }){
 
         <div className="hidden md:flex space-x-8">
           {links.map(link=>(
-            <Link href={link.link} key={link.id}>{link.tag}</Link>
-          ))}
+              <Link href={link.link} key={link.id}>{link.tag}</Link>
+            ))}
         </div>
-
-          {authverification?.user ? (
+        {authverification?.user ? (
+          <div className="flex items-center space-x-4">
+            <div className="relative h-12 w-12 flex items-center bg-[#006eeb] justify-center rounded-full">
+            <User />
+            </div>
+            <Camera size={14} fill="true" className="absolute top-0% bottom-5 right-35"/>
             <form action={logout}>
               <button type="submit" className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors">Log out</button>
             </form>
-          ) : (
-            <Link className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors" href="/login">Sign in</Link>
-          )}
+          </div>
+        ) : (
+          <Link className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors" href="/login">Sign in</Link>
+        )}
       </nav>
 
       {/* Mobile bottom icon nav */}
