@@ -40,17 +40,19 @@ export default function GenresPage() {
     }
   };
 
-  const genreColors = [
-    "from-red-500 to-pink-500",
-    "from-blue-500 to-cyan-500",
-    "from-green-500 to-emerald-500",
-    "from-purple-500 to-indigo-500",
-    "from-orange-500 to-yellow-500",
-    "from-teal-500 to-blue-500",
-    "from-pink-500 to-rose-500",
-    "from-indigo-500 to-purple-500",
-    "from-cyan-500 to-teal-500",
-    "from-yellow-500 to-orange-500",
+  // Replace gradient palette with representative background images for each genre.
+  // These are public Unsplash images — feel free to swap with local `/public/images/...` assets.
+  const genreImages = [
+    "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1505682634904-d7c0bfb45a2f?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1499363536502-3f6d0e6d3f2e?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1502136969935-8d7f3b57f9a0?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1508780709619-79562169bc64?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=1600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1600&q=80&auto=format&fit=crop",
   ];
 
   return (
@@ -90,19 +92,18 @@ export default function GenresPage() {
         {/* Genre Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {getGenreList().map((genre, index) => (
-            <Link
-              key={genre.id}
-              href={getGenreLink(genre.id)}
-              className="group"
-            >
+            <Link key={genre.id} href={getGenreLink(genre.id)} className="group">
               <div
-                className={`relative h-32 rounded-lg bg-linear-to-br ${
-                  genreColors[index % genreColors.length]
-                } overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
+                className={`relative h-32 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
+                style={{
+                  backgroundImage: `linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.22)), url('${genreImages[index % genreImages.length]}')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
               >
-                {/* Overlay pattern */}
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all" />
-                
+                {/* Overlay pattern (subtle) */}
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-all" />
+
                 {/* Genre name */}
                 <div className="relative h-full flex items-center justify-center p-4">
                   <h3 className="text-white text-lg md:text-xl font-bold text-center drop-shadow-lg">
@@ -110,8 +111,8 @@ export default function GenresPage() {
                   </h3>
                 </div>
 
-                {/* Hover effect */}
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-all" />
+                {/* Hover tint */}
+                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all" />
               </div>
             </Link>
           ))}
