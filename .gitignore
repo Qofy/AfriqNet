@@ -24,7 +24,7 @@
 .DS_Store
 *.pem
 
-/movies
+/movies/*.mp4
 
 # debug
 npm-debug.log*
