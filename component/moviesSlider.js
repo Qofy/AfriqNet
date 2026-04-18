@@ -84,7 +84,7 @@ export default function MovieSlider({ movies = sampleMovies }) {
   const currentMovie = movies[currentIndex];
 
   return (
-    <div className="relative w-full h-250  md:h-190 overflow-hidden group">
+    <div className="relative w-full h-100 md:h-250 overflow-hidden group">
       {/* Background Image with Overlay */}
       <div
         className={`absolute inset-0 transition-opacity duration-500 ${
@@ -97,6 +97,7 @@ export default function MovieSlider({ movies = sampleMovies }) {
               src={currentMovie.backdrop || currentMovie.poster}
               alt={currentMovie.title || "Movie backdrop"}
               fill
+              sizes="20"
               priority
               className="object-cover object-center"
             />
@@ -110,7 +111,7 @@ export default function MovieSlider({ movies = sampleMovies }) {
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex items-center mt-12">
+      <div className="relative h-100 md:h-220 flex items-center mt-8 md:mt-20">
         <div className="container mx-auto px-6 md:px-12 max-w-7xl">
           <div
             className={`max-w-2xl transition-all duration-500 ${
@@ -118,12 +119,12 @@ export default function MovieSlider({ movies = sampleMovies }) {
             }`}
           >
             {/* Title */}
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+            <h1 className="text-2xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
               {currentMovie?.title || "Untitled"}
             </h1>
 
             {/* Meta Info */}
-            <div className="flex items-center gap-4 mb-4 text-white/90">
+            <div className="flex items-center gap-2 mb-2 text-white/90 text-sm">
               {currentMovie?.rating && (
                 <div className="flex items-center gap-1">
                   <Star size={16} fill="gold" color="gold" />
@@ -138,27 +139,37 @@ export default function MovieSlider({ movies = sampleMovies }) {
 
             {/* Tagline */}
             {currentMovie?.tagline && (
-              <p className="text-xl text-white/80 italic mb-4">
+              <p className="text-sm md:text-sm text-white/80 italic mb-2">
                 &ldquo;{currentMovie.tagline}&rdquo;
               </p>
             )}
 
             {/* Overview */}
             {currentMovie?.overview && (
-              <p className="text-white/90 text-lg mb-6 line-clamp-3 leading-relaxed">
+              <p className="text-white/90 text-sm md:text-sm mb-4 line-clamp-2 md:line-clamp-2 leading-relaxed">
                 {currentMovie.overview}
               </p>
             )}
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
-              <button className="btn-color btn-hover text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all transform hover:scale-105">
-                <Play size={20} fill="white" />
-                Play Now
+            <div className="flex flex-row flex-wrap gap-3 items-center justify-start">
+              <button className="btn-color btn-hover text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold flex items-center gap-2 justify-center transition-all transform hover:scale-105">
+                <Play size={18} fill="white" />
+                <span className="text-sm sm:text-base">Play Now</span>
               </button>
-              <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all">
-                <Info size={20} />
-                More Info
+              <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold flex items-center gap-2 justify-center transition-all">
+                <Info size={18} />
+                <span className="text-sm sm:text-base">More Info</span>
+              </button>
+
+              {/* Autoplay toggle (inline, visible on all sizes) */}
+              <button
+                onClick={() => setIsAutoPlay(!isAutoPlay)}
+                aria-label="Toggle autoplay"
+                title={isAutoPlay ? 'Autoplay on' : 'Autoplay off'}
+                className={`inline-flex items-center justify-center px-3 py-2 rounded-md text-white transition-colors ${isAutoPlay ? 'bg-green-500' : 'bg-black/50 hover:bg-black/70'} md:ml-2`}
+              >
+                <Play size={16} />
               </button>
             </div>
           </div>
@@ -168,21 +179,23 @@ export default function MovieSlider({ movies = sampleMovies }) {
       {/* Navigation Arrows */}
       <button
         onClick={goToPrevious}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100"
+        className="hidden md:block md:absolute md:left-4 md:top-1/2 md:-translate-y-1/2 md:bg-black/50 md:hover:bg-black/70 md:text-white md:p-3 md:rounded-full md:transition-all md:opacity-0 md:group-hover:opacity-100"
         aria-label="Previous slide"
       >
         <ChevronLeft size={24} />
       </button>
       <button
         onClick={goToNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100"
+        className="hidden md:block md:absolute md:right-4 md:top-1/2 md:-translate-y-1/2 md:bg-black/50 md:hover:bg-black/70 md:text-white md:p-3 md:rounded-full md:transition-all md:opacity-0 md:group-hover:opacity-100"
         aria-label="Next slide"
       >
         <ChevronRight size={24} />
       </button>
 
+      {/* mobile autoplay toggle was moved inline with action buttons */}
+
       {/* Dots Indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
         {movies.slice(0, Math.min(movies.length, 10)).map((_, index) => (
           <button
             key={index}
@@ -195,15 +208,6 @@ export default function MovieSlider({ movies = sampleMovies }) {
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
-      </div>
-      {/* Auto-play indicator */}
-      <div className="absolute top-160 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          onClick={() => setIsAutoPlay(!isAutoPlay)}
-          className="bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-full text-sm transition-all"
-        >
-          {isAutoPlay ? "Auto-play ON" : "Auto-play OFF"}
-        </button>
       </div>
     </div>
 

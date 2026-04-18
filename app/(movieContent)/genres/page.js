@@ -94,7 +94,7 @@ export default function GenresPage() {
           {getGenreList().map((genre, index) => (
             <Link key={genre.id} href={getGenreLink(genre.id)} className="group">
               <div
-                className={`relative h-32 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
+                className={`relative h-32 rounded-lg overflow-hidden transition-all duration-300 md:hover:scale-105 md:hover:shadow-2xl`} 
                 style={{
                   backgroundImage: `linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.22)), url('${genreImages[index % genreImages.length]}')`,
                   backgroundSize: "cover",
