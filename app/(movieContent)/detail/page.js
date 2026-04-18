@@ -1,18 +1,28 @@
-import { sampleMovies, sampleTVShows, sampleMusicVideos } from "@/component/data/sampleData";
+// import { sampleMovies, sampleTVShows, sampleMusicVideos } from "@/component/data/sampleData";
 import { MovieRow } from "@/component/movieRow";
 import { MovieHero } from "@/component/MovieHero";
 import DetailTabs from "@/component/DetailTabs";
+import { getAllMovies, getAllMusicVideos, getAllTVShows } from "../../../lib/db.server";
 
 export default async function DetailPage({ searchParams }) {
   const params = await searchParams;
   const movieId = params?.id;
+  const sampleMovies = getAllMovies();
+  const sampleTVShows = getAllTVShows();
+  const sampleMusicVideos = getAllMusicVideos();
 
   // Find the content by ID from URL params (search both movies and TV shows)
   const allContent = [...sampleMovies, ...sampleTVShows, ...sampleMusicVideos];
   const movie = allContent.find((item) => item.id === movieId) || sampleMovies[0];
 
   // Related/similar movies
-  const relatedMovies = sampleMovies.slice(1, 7);
+  // Related: pick other movies that share at least one genre with the current movie
+  const relatedMovies = sampleMovies.filter(m => {
+    if (!movie || !m || m.id === movie.id) return false;
+    const a = movie.genre_ids || [];
+    const b = m.genre_ids || [];
+    return a.some(g => b.includes(g));
+  }).slice(0, 6);
 
   // Sample cast data (server-side)
   const cast = [
