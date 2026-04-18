@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Play, Share2, Star, Clock, Calendar } from "lucide-react";
+import PlayButton from "./PlayButton.client";
 import WatchlistButton from "./WatchlistButton";
 
 export const MovieHero = ({ movie }) => {
@@ -75,10 +76,7 @@ export const MovieHero = ({ movie }) => {
                 )}
 
                 <div className="flex flex-wrap gap-3">
-                  <button className="btn-color btn-hover text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold flex items-center gap-2 sm:gap-3 transition-all transform hover:scale-105 text-sm sm:text-base">
-                    <Play size={18} fill="white" />
-                    <span>Play Now</span>
-                  </button>
+                  <PlayButton movieId={movie?.id} />
                   <div>
                     <WatchlistButton movieId={movie?.id} />
                   </div>
