@@ -24,7 +24,7 @@
 .DS_Store
 *.pem
 
-/movies/*.mp4
+movies/*.mp4
 
 # debug
 npm-debug.log*
@@ -41,3 +41,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+movies/*.mp4
