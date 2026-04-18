@@ -43,9 +43,9 @@ export default function ContinueWatching({ watchingList = [] }) {
           <h2 className="text-2xl md:text-3xl font-bold text-white">
             Continue Watching
           </h2>
-          <button className="text-[#a2cbf9] hover:text-white text-sm font-medium transition-colors">
+          {/* <button className="text-[#a2cbf9] hover:text-white text-sm font-medium transition-colors">
             See All
-          </button>
+          </button> */}
         </div>
 
         {/* Scrollable Container */}

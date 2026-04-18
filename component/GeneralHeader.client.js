@@ -63,12 +63,12 @@ export default function GeneralHeaderClient({ authverification }) {
   return (
     <>
       <nav
-        className={`flex justify-between items-center p-6 lg:px-8 fixed z-100 w-full transition-colors duration-300 ${
+        className={`flex justify-between items-center p-3 md:p-6 lg:px-8 fixed z-100 w-full transition-colors duration-300 ${
           scrolled ? "bg-black/70 backdrop-blur-md shadow-md" : "bg-transparent"
         }`}
       >
         <div className="flex items-center space-x-2">
-          <Link href="/" className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center relative overflow-hidden">
+          <Link href="/home" className="w-10 h-10 md:w-12 md:h-12 bg-red-600 rounded-lg flex items-center justify-center relative overflow-hidden">
             <Image src="/images/logo.png" alt="logo" fill priority className="object-cover object-center" />
           </Link>
         </div>
@@ -82,9 +82,9 @@ export default function GeneralHeaderClient({ authverification }) {
         </div>
 
         {authverification?.user ? (
-          <div className="flex items-center space-x-4">
-            <div className="relative h-12 w-12 flex items-center bg-[#006eeb] justify-center rounded-full overflow-visible">
-              {profileUrl ? <Image src={profileUrl} alt="profile" fill className="object-cover rounded-full" /> : <User />}
+          <div className="relative inline-block group cursor-pointer">
+              <div className="relative h-10 w-10 md:h-12 md:w-12 flex items-center bg-[#006eeb] justify-center rounded-full overflow-visible">
+                {profileUrl ? <Image src={profileUrl} alt="profile" fill className="object-cover rounded-full" /> : <User />}
 
               <input ref={inputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
 
@@ -100,11 +100,18 @@ export default function GeneralHeaderClient({ authverification }) {
               </button>
             </div>
 
-            <form action={logout}>
-              <button type="submit" className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors">
-                Log out
-              </button>
-            </form>
+            <div className="hidden absolute right-0 top-full  z-20 group-hover:block group-focus-within:block">
+              <div className="transform opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:scale-100 transition-all duration-150 origin-top-right bg-black/80 text-white rounded-md shadow-[0_8px_24px_rgba(0,0,0,0.25)] min-w-45 py-2 px-1">
+                <Link href={"/profile/manage"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Manage profile</Link>
+                <Link href={"/account"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Account</Link>
+                <Link href={"/help"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Help</Link>
+                <div className="border-t border-white/10 mt-1 pt-2 px-1">
+                  <form action={logout}>
+                    <button type="submit" className="w-full text-left px-3 py-2 text-sm text-white rounded bg-[#006eeb] hover:bg-[#0a63d6]">Sign out</button>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <Link className="btn-color btn-hover text-white px-6 py-2 rounded-lg transition-colors" href="/login">
@@ -113,31 +120,31 @@ export default function GeneralHeaderClient({ authverification }) {
         )}
       </nav>
 
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-t border-white/10 rounded-2xl h-12" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-        <div className="max-w-3xl mx-auto px-10 py-2 flex justify-between items-center">
+      <div className="md:hidden fixed inset-x-3 bottom-3 z-50 bg-black/80 backdrop-blur-md border-t border-white/10 rounded-2xl h-10" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+        <div className="mx-auto w-full max-w-3xl px-4 py-2 flex justify-between items-center">
           <Link href="/home" aria-label="Home" className="flex flex-col items-center text-white text-xs">
             <Home size={20} />
           </Link>
 
-          <Link href="/movies" aria-label="Movies" className="flex flex-col items-center text-white text-xs">
+          <Link href="/movies" aria-label="Movies" className="flex flex-col items-center text-white text-xs px-2">
             <Film size={20} />
           </Link>
 
-          <Link href="/tvShows" aria-label="TV Shows" className="flex flex-col items-center text-white text-xs">
+          <Link href="/tvShows" aria-label="TV Shows" className="flex flex-col items-center text-white text-xs px-2">
             <Tv size={20} />
           </Link>
 
-          <Link href="/genres" aria-label="Genres" className="flex flex-col items-center text-white text-xs">
+          <Link href="/genres" aria-label="Genres" className="flex flex-col items-center text-white text-xs px-2">
             <List size={20} />
           </Link>
 
-          <Link href="/musicVideos" aria-label="Music Videos" className="flex flex-col items-center text-white text-xs">
+          <Link href="/musicVideos" aria-label="Music Videos" className="flex flex-col items-center text-white text-xs px-2">
             <Music size={20} />
           </Link>
 
-          <Link href="/login" aria-label="Sign In" className="flex flex-col items-center text-white text-xs">
+          {/* <Link href="/login" aria-label="Sign In" className="flex flex-col items-center text-white text-xs">
             <User size={20} />
-          </Link>
+          </Link> */}
         </div>
       </div>
     </>
