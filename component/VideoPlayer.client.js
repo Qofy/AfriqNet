@@ -167,10 +167,10 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
     const min = Math.floor(s / 60);
     return `${min}:${sec}`;
   }
-
+  const date = Date().now
   const lastSavedLabel = useMemo(() => {
     if (!lastSaved) return null;
-    const diff = Math.floor((Date.now() - lastSaved) / 1000);
+    const diff = Math.floor((date - lastSaved) / 1000);
     if (diff < 5) return 'just now';
     if (diff < 60) return `${diff}s ago`;
     const m = Math.floor(diff / 60);
