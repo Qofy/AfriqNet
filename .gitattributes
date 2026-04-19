@@ -1,1 +1,2 @@
+*.mp4 filter=lfs diff=lfs merge=lfs -text
 movies/THE_CHEF_AND_I.mp4 filter=lfs diff=lfs merge=lfs -text
