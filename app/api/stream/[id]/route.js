@@ -57,7 +57,7 @@ export async function GET(req, { params }) {
 
     return new Response(stream, { status: 200, headers });
   } catch (err) {
-    console.error('Stream error', err);
-    return new Response('Internal server error', { status: 500 });
+      return new Response('Internal server error', { status: 500 });
+    //   throw new Error('Stream error', err);
   }
 }
