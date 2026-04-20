@@ -13,6 +13,19 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
   const [lastSaved, setLastSaved] = useState(null);
   const [resumeNotice, setResumeNotice] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [nowTick, setNowTick] = useState(0);
+
+  useEffect(() => {
+    if (!lastSaved) return;
+    // schedule initial tick (deferred) and update every second so "last saved" label is live
+    const init = setTimeout(() => setNowTick(Date.now()), 0);
+    const t = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => {
+      clearInterval(t);
+      clearTimeout(init);
+    };
+  }, [lastSaved]);
 
   // stable send progress helper (used by multiple handlers)
   const postProgress = useCallback(async (position, duration) => {
@@ -38,14 +51,23 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
     const onPlay = () => {
       setPlaying(true);
       setShowOverlay(false);
+      setErrorMessage(null);
     };
     const onPause = () => {
       setPlaying(false);
       setShowOverlay(true);
     };
+    const onError = () => {
+      // Media resource failed to load or is not playable (404, wrong MIME, etc.)
+      setPlaying(false);
+      setShowOverlay(true);
+      setErrorMessage('Playback failed: media resource unavailable or not playable.');
+      console.error('Video element error', video.error);
+    };
 
     video.addEventListener("play", onPlay);
     video.addEventListener("pause", onPause);
+    video.addEventListener('error', onError);
     const onTime = () => {
       setCurrentTime(video.currentTime || 0);
       setDurationState(video.duration || 0);
@@ -56,6 +78,7 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
       video.removeEventListener("play", onPlay);
       video.removeEventListener("pause", onPause);
       video.removeEventListener('timeupdate', onTime);
+      video.removeEventListener('error', onError);
     };
   }, []);
 
@@ -155,7 +178,14 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
-      video.play();
+      const p = video.play();
+      if (p && typeof p.then === 'function') {
+        p.catch((err) => {
+          console.error('Play failed', err);
+          setErrorMessage('Unable to start playback. Tap play to try again.');
+          setShowOverlay(true);
+        });
+      }
     } else {
       video.pause();
     }
@@ -167,15 +197,15 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
     const min = Math.floor(s / 60);
     return `${min}:${sec}`;
   }
-  const date = Date().now
   const lastSavedLabel = useMemo(() => {
     if (!lastSaved) return null;
-    const diff = Math.floor((date - lastSaved) / 1000);
+    if (!nowTick) return 'just now';
+    const diff = Math.floor((nowTick - lastSaved) / 1000);
     if (diff < 5) return 'just now';
     if (diff < 60) return `${diff}s ago`;
     const m = Math.floor(diff / 60);
     return `${m}m ago`;
-  }, [lastSaved]);
+  }, [lastSaved, nowTick]);
 
   function onSeekChange(e) {
     const val = Number(e.target.value);
@@ -246,6 +276,12 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
           Resumed to {formatTime(resumeNotice)}
         </div>
       )}
+        {/* Playback error banner */}
+        {errorMessage && (
+          <div className="absolute left-1/2 transform -translate-x-1/2 top-16 bg-red-700/80 text-white px-4 py-2 rounded-md text-sm">
+            {errorMessage}
+          </div>
+        )}
       {/* Progress / seek bar */}
       <div className="absolute left-0 right-0 bottom-20 sm:bottom-16 px-4 sm:px-6">
         <input

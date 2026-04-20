@@ -102,7 +102,7 @@ export default function GeneralHeaderClient({ authverification }) {
 
             <div className="hidden absolute right-0 top-full  z-20 group-hover:block group-focus-within:block">
               <div className="transform opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:scale-100 transition-all duration-150 origin-top-right bg-black/80 text-white rounded-md shadow-[0_8px_24px_rgba(0,0,0,0.25)] min-w-45 py-2 px-1">
-                <Link href={"/profile/manage"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Manage profile</Link>
+                <Link href={"/manageProfile"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Manage profile</Link>
                 <Link href={"/account"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Account</Link>
                 <Link href={"/help"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Help</Link>
                 <div className="border-t border-white/10 mt-1 pt-2 px-1">
