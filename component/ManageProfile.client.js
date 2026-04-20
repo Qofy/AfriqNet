@@ -158,7 +158,7 @@ export default function ManageProfileClient({ user }) {
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 mt-8">
           <Link href="/home" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4">
             <ArrowLeft size={20} />
             <span>Back to Home</span>
@@ -183,7 +183,7 @@ export default function ManageProfileClient({ user }) {
           
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="relative">
-              <div className="relative h-32 w-32 flex items-center bg-gradient-to-br from-blue-500 to-purple-600 justify-center rounded-full overflow-hidden border-4 border-gray-700">
+              <div className="relative h-32 w-32 flex items-center bg-blue-500  justify-center rounded-full overflow-hidden border-4 border-gray-700">
                 {profileUrl ? (
                   <Image src={profileUrl} alt="profile" fill className="object-cover" />
                 ) : (
