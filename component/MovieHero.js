@@ -1,23 +1,94 @@
+"use client";
+
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
-import { Play, Share2, Star, Clock, Calendar } from "lucide-react";
+import { Play, Share2, Star, Clock, Calendar, Volume, VolumeX } from "lucide-react";
 import PlayButton from "./PlayButton.client";
 import WatchlistButton from "./WatchlistButton";
 
 export const MovieHero = ({ movie }) => {
+  const videoRef = useRef(null);
+  const [muted, setMuted] = useState(true);
+  const [playing, setPlaying] = useState(true);
+
+  // Autoplay muted on mount if there's a trailer
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.play().catch(() => {
+      // ignore autoplay failures
+      setPlaying(false);
+    });
+  }, [movie?.trailer]);
+
+  const toggleMute = async () => {
+    const v = videoRef.current;
+    if (!v) return;
+    try {
+      if (muted) {
+        v.muted = false;
+        await v.play();
+        setMuted(false);
+        setPlaying(true);
+      } else {
+        v.muted = true;
+        setMuted(true);
+      }
+    } catch (e) {
+      console.warn("Failed to toggle mute/play:", e);
+    }
+  };
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play();
+      setPlaying(true);
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
+  };
+
   return (
     <section className="relative w-full h-[66vh] sm:h-[74vh] md:h-screen overflow-hidden">
-      {/* Backdrop */}
-      {movie?.backdrop ? (
+      {/* Backdrop video if available */}
+      {movie?.trailer ? (
         <>
-          <Image
-            src={movie.backdrop}
-            alt={movie.title || movie.name}
-            fill
-            priority
-            className="object-cover object-center"
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            src={movie.trailer}
+            loop
+            playsInline
+            muted={muted}
+            aria-hidden
           />
+
+          {/* Dark gradients to keep content readable */}
           <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-transparent" />
           <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent" />
+
+          {/* Controls overlay (sound + play) */}
+          <div className="absolute left-6 bottom-6 z-20 flex items-center gap-3">
+            <button
+              onClick={togglePlay}
+              aria-label={playing ? "Pause backdrop" : "Play backdrop"}
+              className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg flex items-center justify-center"
+            >
+              <Play size={18} />
+            </button>
+
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? "Unmute backdrop" : "Mute backdrop"}
+              className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg flex items-center justify-center"
+            >
+              {muted ? <VolumeX size={18} /> : <Volume size={18} />}
+            </button>
+          </div>
         </>
       ) : (
         <div className="absolute inset-0 bg-linear-to-br from-[#38cff0] to-[#039aec]" />
@@ -29,7 +100,7 @@ export const MovieHero = ({ movie }) => {
           <div className="flex items-center">
             <div className="max-w-2xl">
               <div className="hidden md:block shrink-0 w-48 md:w-56 lg:w-64">
-                <div className="relative aspect-[2/3] rounded-lg overflow-hidden shadow-2xl">
+                <div className="relative aspect-2/3 rounded-lg overflow-hidden shadow-2xl">
                   {movie?.poster ? (
                     <Image src={movie.poster} alt={movie.title || movie.name} fill className="object-cover" />
                   ) : (
