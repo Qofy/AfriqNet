@@ -72,7 +72,7 @@ export const MovieHero = ({ movie }) => {
           <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent" />
 
           {/* Controls overlay (sound + play) */}
-          <div className="absolute left-6 bottom-6 z-20 flex items-center gap-3">
+          <div className="absolute left-6 bottom-6 z-20 flex items-center gap-3 ml-25">
             <button
               onClick={togglePlay}
               aria-label={playing ? "Pause backdrop" : "Play backdrop"}
@@ -89,6 +89,18 @@ export const MovieHero = ({ movie }) => {
               {muted ? <VolumeX size={18} /> : <Volume size={18} />}
             </button>
           </div>
+        </>
+      ) : movie?.backdrop || movie?.poster ? (
+        <>
+          <Image
+            src={movie.backdrop || movie.poster}
+            alt={movie.title || movie.name}
+            fill
+            priority
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent" />
         </>
       ) : (
         <div className="absolute inset-0 bg-linear-to-br from-[#38cff0] to-[#039aec]" />
