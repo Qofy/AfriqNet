@@ -1,4 +1,4 @@
-import { MovieCard } from "./movieCard";
+import MovieCardWithTrailer from "./MovieCardWithTrailer.client";
 
 export const MovieRow = ({ title, movies, showSeeAll = true }) => (
   <div className="py-6 px-6">
@@ -14,7 +14,7 @@ export const MovieRow = ({ title, movies, showSeeAll = true }) => (
       
       <div className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4">
         {movies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
+          <MovieCardWithTrailer key={movie.id} movie={movie} />
         ))}
       </div>
     </div>
