@@ -19,7 +19,7 @@ export default function GeneralHeaderClient({ authverification }) {
     { id: 0, link: "/home", tag: "Home", icon: Home },
     { id: 1, link: "/movies", tag: "Movies", icon: Film },
     { id: 2, link: "/tvShows", tag: "TV Shows", icon: Tv },
-    { id: 3, link: "/genres", tag: "Genres", icon: List },
+    // { id: 3, link: "/genres", tag: "Genres", icon: List },
     { id: 4, link: "/musicVideos", tag: "Music", icon: Music },
   ];
 
