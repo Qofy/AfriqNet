@@ -6,14 +6,14 @@ import Link from "next/link";
 import { Star, Clapperboard } from "lucide-react";
 
 function MovieGridCard({ movie }) {
-  const [showTrailer, setShowTrailer] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
   const videoRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
 
   const handleMouseEnter = () => {
-    if (movie.trailer) {
+    if (movie.trailer || movie.stream) {
       hoverTimeoutRef.current = setTimeout(() => {
-        setShowTrailer(true);
+        setShowVideo(true);
       }, 300);
     }
   };
@@ -22,18 +22,18 @@ function MovieGridCard({ movie }) {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
     }
-    setShowTrailer(false);
+    setShowVideo(false);
   };
 
   useEffect(() => {
     const video = videoRef.current;
-    if (showTrailer && video) {
+    if (showVideo && video) {
       video.play().catch(() => {});
-    } else if (!showTrailer && video) {
+    } else if (!showVideo && video) {
       video.pause();
       video.currentTime = 0;
     }
-  }, [showTrailer]);
+  }, [showVideo]);
 
   useEffect(() => {
     return () => {
@@ -43,6 +43,8 @@ function MovieGridCard({ movie }) {
     };
   }, []);
 
+  const videoSrc = movie.trailer || movie.stream;
+
   return (
     <Link
       href={`/detail?id=${movie.id}`}
@@ -51,9 +53,9 @@ function MovieGridCard({ movie }) {
       onMouseLeave={handleMouseLeave}
     >
       {/* Poster */}
-      <div className="relative h-64 bg-linear-to-br from-[#38cff0] to-[#039aec]">
+      <div className="relative h-64 bg-black">
         {/* Poster Image */}
-        {movie.poster && !showTrailer && (
+        {movie.poster && !showVideo && (
           <Image
             src={movie.poster}
             alt={movie.title || movie.name}
@@ -63,8 +65,8 @@ function MovieGridCard({ movie }) {
           />
         )}
 
-        {/* Trailer Video */}
-        {showTrailer && movie.trailer && (
+        {/* Video (trailer or stream) */}
+        {showVideo && videoSrc && (
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover"
@@ -72,12 +74,12 @@ function MovieGridCard({ movie }) {
             muted
             playsInline
           >
-            <source src={movie.trailer} type="video/mp4" />
+            <source src={videoSrc} type="video/mp4" />
           </video>
         )}
 
         {/* Fallback */}
-        {!movie.poster && !showTrailer && (
+        {!movie.poster && !showVideo && (
           <div className="flex items-center justify-center h-full">
             <Clapperboard className="text-white" size={40} />
           </div>
@@ -89,10 +91,12 @@ function MovieGridCard({ movie }) {
           <span className="text-white text-xs font-medium">{movie.rating}</span>
         </div>
 
-        {/* Trailer indicator */}
-        {movie.trailer && (
+        {/* Video indicator */}
+        {videoSrc && (
           <div className="absolute bottom-2 left-2 bg-red-600/90 backdrop-blur-sm rounded px-2 py-0.5 z-10">
-            <span className="text-white text-xs font-bold">TRAILER</span>
+            {/* <span className="text-white text-xs font-bold">
+              {movie.trailer ? 'TRAILER' : 'STREAM'}
+            </span> */}
           </div>
         )}
       </div>

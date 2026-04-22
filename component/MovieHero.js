@@ -11,7 +11,10 @@ export const MovieHero = ({ movie }) => {
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(true);
 
-  // Autoplay muted on mount if there's a trailer
+  // Determine content type - if it has a stream field, it's likely a music video
+  const contentType = movie?.stream && !movie?.video_stram ? "music_video" : "movie";
+
+  // Autoplay muted on mount if there's a trailer or stream
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -20,7 +23,7 @@ export const MovieHero = ({ movie }) => {
       // ignore autoplay failures
       setPlaying(false);
     });
-  }, [movie?.trailer]);
+  }, [movie?.trailer, movie?.stream]);
 
   const toggleMute = async () => {
     const v = videoRef.current;
@@ -55,12 +58,12 @@ export const MovieHero = ({ movie }) => {
   return (
     <section className="relative w-full h-[66vh] sm:h-[74vh] md:h-screen overflow-hidden">
       {/* Backdrop video if available */}
-      {movie?.trailer ? (
+      {movie?.trailer || movie?.stream ? (
         <>
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover"
-            src={movie.trailer}
+            src={movie.trailer || movie.stream}
             loop
             playsInline
             muted={muted}
@@ -159,7 +162,7 @@ export const MovieHero = ({ movie }) => {
                 )}
 
                 <div className="flex flex-wrap gap-3">
-                  <PlayButton movieId={movie?.id} />
+                  <PlayButton movieId={movie?.id} contentType={contentType} />
                   <div>
                     <WatchlistButton movieId={movie?.id} />
                   </div>
