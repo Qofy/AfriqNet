@@ -82,6 +82,9 @@ export default function MovieSlider({ movies = sampleMovies }) {
   }
 
   const currentMovie = movies[currentIndex];
+  
+  // Determine content type - if it has a stream field, it's likely a music video
+  const contentType = currentMovie?.stream && !currentMovie?.video_stram ? "music_video" : "movie";
 
   return (
     <div className="relative w-full h-100 md:h-250 overflow-hidden group">
@@ -155,6 +158,7 @@ export default function MovieSlider({ movies = sampleMovies }) {
             <div className="flex flex-row flex-wrap gap-3 items-center justify-start">
               <PlayButton
                 movieId={currentMovie?.id}
+                contentType={contentType}
                 className="btn-color btn-hover text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold flex items-center gap-2 justify-center transition-all transform hover:scale-105 text-base md:text-lg"
               />
               <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold flex items-center gap-2 justify-center transition-all">

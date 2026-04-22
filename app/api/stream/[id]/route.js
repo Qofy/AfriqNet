@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { getMovieById } from '@/lib/db.server';
+import { getMovieById, getMusicVideoById } from '@/lib/db.server';
 
 export async function GET(req, { params }) {
   try {
@@ -9,14 +9,38 @@ export async function GET(req, { params }) {
     const id = resolved?.id;
     if (!id) return new Response('Missing id', { status: 400 });
 
-    const movie = getMovieById(id);
-    if (!movie || !movie.video_stram) {
-      return new Response('Movie or video not found', { status: 404 });
+    // Get type from query params
+    const url = new URL(req.url);
+    const type = url.searchParams.get('type');
+
+    // Try to get content - check type parameter first, then try both
+    let content = null;
+    let videoPath = null;
+
+    if (type === 'music_video') {
+      content = getMusicVideoById(id);
+      videoPath = content?.stream;
+    } else if (type === 'movie') {
+      content = getMovieById(id);
+      videoPath = content?.video_stram;
+    } else {
+      // Try movie first, then music video
+      content = getMovieById(id);
+      if (content && content.video_stram) {
+        videoPath = content.video_stram;
+      } else {
+        content = getMusicVideoById(id);
+        videoPath = content?.stream;
+      }
     }
 
-    // Resolve file path (support absolute-ish stored like '/movies/THE_CHEF_AND_I.mp4')
-    const rel = movie.video_stram.replace(/^\//, '');
-    const filePath = path.resolve(process.cwd(), rel);
+    if (!content || !videoPath) {
+      return new Response('Content or video not found', { status: 404 });
+    }
+
+    // Resolve file path - add 'public' prefix for files served from public directory
+    const rel = videoPath.replace(/^\//, '');
+    const filePath = path.resolve(process.cwd(), 'public', rel);
 
     if (!fs.existsSync(filePath)) {
       return new Response('File not found', { status: 404 });
@@ -56,8 +80,9 @@ export async function GET(req, { params }) {
     headers.set('Accept-Ranges', 'bytes');
 
     return new Response(stream, { status: 200, headers });
-  } catch (err) {
+  } catch (error) {
+      console.error('Streaming error:', error);
       return new Response('Internal server error', { status: 500 });
-    //   throw new Error('Stream error', err);
+    //   throw new Error('Stream error', error);
   }
 }

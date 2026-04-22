@@ -5,6 +5,7 @@ import { Play } from "lucide-react";
 
 export default function PlayButton({
   movieId,
+  contentType = "movie", // 'movie' or 'music_video'
   className =
     "btn-color cursor-pointer btn-hover text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold flex items-center gap-2 sm:gap-3 transition-all transform hover:scale-105 text-sm sm:text-base",
 }) {
@@ -13,8 +14,8 @@ export default function PlayButton({
   function handleClick(e) {
     e?.preventDefault();
     if (!movieId) return;
-    // SPA navigate to watching page with autoplay flag
-    router.push(`/watching?id=${movieId}&autoplay=1`);
+    // SPA navigate to watching page with autoplay flag and content type
+    router.push(`/watching?id=${movieId}&type=${contentType}&autoplay=1`);
   }
 
   return (
