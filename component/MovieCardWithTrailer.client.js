@@ -48,18 +48,18 @@ export default function MovieCardWithTrailer({ movie }) {
   return (
     <Link 
       href={`/detail?id=${movie.id}`} 
-      className="shrink-0 w-48 group cursor-pointer block"
+      className="group cursor-pointer block w-full"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="relative h-72 rounded-lg overflow-hidden bg-linear-to-br from-[#38cff0] to-[#039aec] transition-all transform group-hover:scale-105 group-hover:shadow-2xl duration-300">
+      <div className="relative w-full aspect-2/3 rounded-lg overflow-hidden bg-linear-to-br from-[#38cff0] to-[#039aec] transition-all transform group-hover:scale-105 group-hover:shadow-2xl duration-300">
         {/* Poster Image */}
         {movie.poster && !showTrailer && (
           <Image
             src={movie.poster}
             alt={movie.title}
             fill
-            sizes="192px"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
             className="object-cover object-center"
           />
         )}
