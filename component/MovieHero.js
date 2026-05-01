@@ -74,22 +74,22 @@ export const MovieHero = ({ movie }) => {
           <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-transparent" />
           <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent" />
 
-          {/* Controls overlay (sound + play) */}
-          <div className="absolute left-4 md:left-6 bottom-4 md:bottom-6 z-20 flex items-center gap-2 md:gap-3">
+          {/* Controls overlay (sound + play) - positioned to align with poster on large screens */}
+          <div className="absolute left-4 md:left-6 lg:left-28 bottom-4 md:bottom-6 lg:bottom-12 z-20 flex items-center gap-2 md:gap-3 lg:gap-4">
             <button
               onClick={togglePlay}
               aria-label={playing ? "Pause backdrop" : "Play backdrop"}
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-2 md:p-3 rounded-lg flex items-center justify-center transition-all touch-manipulation"
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-2 md:p-3 lg:p-4 rounded-lg flex items-center justify-center transition-all touch-manipulation shadow-md"
             >
-              <Play size={18} />
+              <Play size={20} />
             </button>
 
             <button
               onClick={toggleMute}
               aria-label={muted ? "Unmute backdrop" : "Mute backdrop"}
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-2 md:p-3 rounded-lg flex items-center justify-center transition-all touch-manipulation"
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-2 md:p-3 lg:p-4 rounded-lg flex items-center justify-center transition-all touch-manipulation shadow-md"
             >
-              {muted ? <VolumeX size={18} /> : <Volume size={18} />}
+              {muted ? <VolumeX size={20} /> : <Volume size={20} />}
             </button>
           </div>
         </>
