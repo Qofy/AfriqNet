@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth';
-import { getDatabase } from '@/lib/db.server';
+import { getUserById, updateUserPassword } from '@/lib/db.server';
 import { hash, verify } from '@node-rs/argon2';
 
 export async function PATCH(request) {
@@ -21,10 +21,8 @@ export async function PATCH(request) {
       return NextResponse.json({ error: 'New password must be at least 6 characters' }, { status: 400 });
     }
 
-    const db = getDatabase();
-
     // Get current user password
-    const user = db.prepare('SELECT password FROM users WHERE id = ?').get(session.userId);
+    const user = await getUserById(session.userId);
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -50,8 +48,7 @@ export async function PATCH(request) {
     });
 
     // Update password
-    const stmt = db.prepare('UPDATE users SET password = ? WHERE id = ?');
-    stmt.run(passwordHash, session.userId);
+    await updateUserPassword(session.userId, passwordHash);
 
     return NextResponse.json({ success: true, message: 'Password changed successfully' });
   } catch (error) {

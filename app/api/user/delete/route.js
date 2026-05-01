@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyAuth, lucia } from '@/lib/auth';
-import { getDatabase } from '@/lib/db.server';
+import { deleteUser, deleteWatchProgressForUser } from '@/lib/db.server';
 import { cookies } from 'next/headers';
 
 export async function DELETE() {
@@ -10,20 +10,16 @@ export async function DELETE() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const db = getDatabase();
-
-    // Delete all user sessions
-    db.prepare('DELETE FROM sessions WHERE user_id = ?').run(session.userId);
+    // Delete all user sessions via Lucia adapter
+    await lucia.invalidateAllUserSessions(session.userId);
 
     // Delete watch progress
-    db.prepare('DELETE FROM watch_progress WHERE user_id = ?').run(session.userId);
+    await deleteWatchProgressForUser(session.userId);
 
     // Delete user account
-    db.prepare('DELETE FROM users WHERE id = ?').run(session.userId);
+    await deleteUser(session.userId);
 
-    // Invalidate current session
-    await lucia.invalidateSession(session.id);
-    
+    // Clear the session cookie
     const cookieStore = await cookies();
     const sessionCookie = lucia.createBlankSessionCookie();
     cookieStore.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
