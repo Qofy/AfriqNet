@@ -15,7 +15,7 @@ export async function signup(prevState, formData) {
     let errors = {};
     
     // Check if user already exists
-    const existingUser = getUserByEmailWrapper(email);
+    const existingUser = await getUserByEmailWrapper(email);
     if (existingUser) {
         errors.email = "It seems there is an account already created with this email!";
     }
@@ -47,9 +47,9 @@ export async function signup(prevState, formData) {
     }
 
     const hashPassword = await hashUserPassword(password);
-     
+
     try {
-        const user = createUsers(users_name, email, hashPassword);
+        const user = await createUsers(users_name, email, hashPassword);
         await createAuthSession(user.id);
     } catch (error) {
         console.error("Signup error:", error);
@@ -67,7 +67,7 @@ export async function signin(prevState, formData) {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    const loginExsistingUser = getUserByEmailWrapper(email);
+    const loginExsistingUser = await getUserByEmailWrapper(email);
     if (!loginExsistingUser) {
         return{
             errors:{
