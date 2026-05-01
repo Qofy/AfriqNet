@@ -12,7 +12,9 @@ export default function GeneralHeaderClient({ authverification }) {
   const [profileUrl, setProfileUrl] = useState(
     authverification?.user?.profileImage || null
   );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
   const pathname = usePathname();
 
   const links = [
@@ -32,6 +34,25 @@ export default function GeneralHeaderClient({ authverification }) {
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   async function handleFileChange(e) {
     const f = e.target.files?.[0];
@@ -102,15 +123,19 @@ export default function GeneralHeaderClient({ authverification }) {
         </div>
 
         {authverification?.user ? (
-          <div className="relative inline-block group cursor-pointer">
-              <div className="relative h-10 w-10 md:h-12 md:w-12 flex items-center bg-[#006eeb] justify-center rounded-full overflow-visible">
+          <div ref={dropdownRef} className="relative inline-block cursor-pointer">
+              <div 
+                className="relative h-10 w-10 md:h-12 md:w-12 flex items-center bg-[#006eeb] justify-center rounded-full overflow-visible"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
                 {profileUrl ? <Image src={profileUrl} alt="profile" fill className="object-cover rounded-full" /> : <User />}
 
               <input ref={inputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
 
               <button
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   inputRef.current?.click();
                 }}
                 title="Upload profile image"
@@ -120,11 +145,33 @@ export default function GeneralHeaderClient({ authverification }) {
               </button>
             </div>
 
-            <div className="hidden absolute right-0 top-full  z-20 group-hover:block group-focus-within:block">
-              <div className="transform opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-focus-within:opacity-100 group-focus-within:scale-100 transition-all duration-150 origin-top-right bg-black/80 text-white rounded-md shadow-[0_8px_24px_rgba(0,0,0,0.25)] min-w-45 py-2 px-1">
-                <Link href={"/manageProfile"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Manage profile</Link>
-                <Link href={"/account"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Account</Link>
-                <Link href={"/help"} className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded">Help</Link>
+            <div className={`absolute right-0 top-full z-20 transition-all duration-150 origin-top-right ${
+              isDropdownOpen 
+                ? 'opacity-100 scale-100 pointer-events-auto' 
+                : 'opacity-0 scale-95 pointer-events-none'
+            }`}>
+              <div className="bg-black/80 backdrop-blur-sm text-white rounded-md shadow-[0_8px_24px_rgba(0,0,0,0.25)] min-w-45 py-2 px-1 mt-2">
+                <Link 
+                  href={"/manageProfile"} 
+                  className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  Manage profile
+                </Link>
+                <Link 
+                  href={"/account"} 
+                  className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  Account
+                </Link>
+                <Link 
+                  href={"/help"} 
+                  className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  Help
+                </Link>
                 <div className="border-t border-white/10 mt-1 pt-2 px-1">
                   <form action={logout}>
                     <button type="submit" className="w-full text-left px-3 py-2 text-sm text-white rounded bg-[#f23914] hover:bg-[#f55754]">Sign out</button>
