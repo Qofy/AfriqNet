@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { 
@@ -20,35 +21,73 @@ import {
   ChevronRight,
   AlertTriangle
 } from 'lucide-react';
+import {
+  setActiveTab,
+  setFormData,
+  setPasswordData,
+  togglePasswordVisibility,
+  setDeleteConfirm,
+  setTheme,
+  toggleNotification,
+  clearError,
+  clearSuccessMessage,
+  initializeUserData,
+  setLoading,
+  setError,
+  setSuccessMessage,
+  setProfileUrl,
+  uploadProfileImage,
+  updateProfile,
+  changePassword,
+  deleteAccount
+} from '../features/accountSlice';
 
 export default function AccountClient({ user }) {
-  const [activeTab, setActiveTab] = useState('profile');
-  const [profileUrl, setProfileUrl] = useState(user.profileImage || null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState('');
-  const [theme, setTheme] = useState('dark');
-  const [notifications, setNotifications] = useState({
-    email: true,
-    push: false,
-    marketing: false
-  });
-  
-  const fileInputRef = useRef(null);
+  const dispatch = useDispatch();
   const router = useRouter();
+  const fileInputRef = useRef(null);
+  
+  const {
+    activeTab,
+    profileUrl,
+    formData,
+    passwordData,
+    showCurrentPassword,
+    showNewPassword,
+    showConfirmPassword,
+    deleteConfirm,
+    theme,
+    notifications,
+    isLoading,
+    error,
+    successMessage
+  } = useSelector((state) => state.account);
 
-  const [formData, setFormData] = useState({
-    name: user.name || '',
-    email: user.email || ''
-  });
+  // Initialize user data on mount
+  useEffect(() => {
+    dispatch(initializeUserData(user));
+  }, [dispatch, user]);
 
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+  // Handle success/error messages
+  useEffect(() => {
+    if (successMessage) {
+      alert(successMessage);
+      dispatch(clearSuccessMessage());
+      
+      if (successMessage === 'Account deleted successfully') {
+        router.push('/');
+      } else if (successMessage === 'Profile image uploaded successfully!') {
+        window.location.reload();
+      }
+    }
+  }, [successMessage, dispatch, router]);
+
+  useEffect(() => {
+    if (error) {
+      alert(error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -62,62 +101,37 @@ export default function AccountClient({ user }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsLoading(true);
+    dispatch(setLoading(true));
+    dispatch(clearError());
+    
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const response = await fetch('/api/upload/profile', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      const result = await response.json();
-      if (response.ok && result.url) {
-        setProfileUrl(result.url);
-        
-        // Update user profile
-        await fetch('/api/user/profile', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ profileUrl: result.url })
-        });
-        
-        window.location.reload(); // Refresh to show new image in header
-      } else {
-        alert('Upload failed: ' + (result.error || 'Unknown error'));
-      }
+      const url = await uploadProfileImage(file);
+      dispatch(setProfileUrl(url));
+      dispatch(setSuccessMessage('Profile image uploaded successfully!'));
     } catch (error) {
-      console.error('Upload error:', error);
-      alert('Upload error');
+      dispatch(setError(error.message));
     } finally {
-      setIsLoading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      dispatch(setLoading(false));
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    
+    dispatch(setLoading(true));
+    dispatch(clearError());
     
     try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      
-      const result = await response.json();
-      if (response.ok) {
-        alert('Profile updated successfully!');
-      } else {
-        alert('Update failed: ' + (result.error || 'Unknown error'));
-      }
+      await updateProfile(formData);
+      dispatch(setFormData(formData));
+      dispatch(setSuccessMessage('Profile updated successfully!'));
     } catch (error) {
-      console.error('Update error:', error);
-      alert('Update failed');
+      dispatch(setError(error.message));
     } finally {
-      setIsLoading(false);
+      dispatch(setLoading(false));
     }
   };
 
@@ -125,44 +139,32 @@ export default function AccountClient({ user }) {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
+      dispatch(setError('New passwords do not match'));
       return;
     }
     
     if (passwordData.newPassword.length < 6) {
-      alert('New password must be at least 6 characters');
+      dispatch(setError('New password must be at least 6 characters'));
       return;
     }
 
-    setIsLoading(true);
+    dispatch(setLoading(true));
+    dispatch(clearError());
+    
     try {
-      const response = await fetch('/api/user/password', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        })
-      });
-      
-      const result = await response.json();
-      if (response.ok) {
-        alert('Password changed successfully!');
-        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      } else {
-        alert('Password change failed: ' + (result.error || 'Unknown error'));
-      }
+      await changePassword(passwordData);
+      dispatch(setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' }));
+      dispatch(setSuccessMessage('Password changed successfully!'));
     } catch (error) {
-      console.error('Password change error:', error);
-      alert('Password change failed');
+      dispatch(setError(error.message));
     } finally {
-      setIsLoading(false);
+      dispatch(setLoading(false));
     }
   };
 
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'DELETE') {
-      alert('Please type DELETE to confirm account deletion');
+      dispatch(setError('Please type DELETE to confirm account deletion'));
       return;
     }
 
@@ -170,24 +172,16 @@ export default function AccountClient({ user }) {
       return;
     }
 
-    setIsLoading(true);
+    dispatch(setLoading(true));
+    dispatch(clearError());
+    
     try {
-      const response = await fetch('/api/user/delete', {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        alert('Account deleted successfully');
-        router.push('/');
-      } else {
-        const result = await response.json();
-        alert('Account deletion failed: ' + (result.error || 'Unknown error'));
-      }
+      await deleteAccount();
+      dispatch(setSuccessMessage('Account deleted successfully'));
     } catch (error) {
-      console.error('Delete account error:', error);
-      alert('Account deletion failed');
+      dispatch(setError(error.message));
     } finally {
-      setIsLoading(false);
+      dispatch(setLoading(false));
     }
   };
 
@@ -239,7 +233,7 @@ export default function AccountClient({ user }) {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    onChange={(e) => dispatch(setFormData({ name: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
                     placeholder="Enter your full name"
                   />
@@ -250,7 +244,7 @@ export default function AccountClient({ user }) {
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => dispatch(setFormData({ email: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
                     placeholder="Enter your email"
                   />
@@ -285,14 +279,14 @@ export default function AccountClient({ user }) {
                     <input
                       type={showCurrentPassword ? "text" : "password"}
                       value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                      onChange={(e) => dispatch(setPasswordData({ currentPassword: e.target.value }))}
                       className="w-full px-3 py-2 pr-10 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
                       placeholder="Enter current password"
                       required
                     />
                     <button
                       type="button"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      onClick={() => dispatch(togglePasswordVisibility('showCurrentPassword'))}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                     >
                       {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -306,7 +300,7 @@ export default function AccountClient({ user }) {
                     <input
                       type={showNewPassword ? "text" : "password"}
                       value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                      onChange={(e) => dispatch(setPasswordData({ newPassword: e.target.value }))}
                       className="w-full px-3 py-2 pr-10 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
                       placeholder="Enter new password"
                       required
@@ -314,7 +308,7 @@ export default function AccountClient({ user }) {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      onClick={() => dispatch(togglePasswordVisibility('showNewPassword'))}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                     >
                       {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -328,7 +322,7 @@ export default function AccountClient({ user }) {
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                      onChange={(e) => dispatch(setPasswordData({ confirmPassword: e.target.value }))}
                       className="w-full px-3 py-2 pr-10 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
                       placeholder="Confirm new password"
                       required
@@ -336,7 +330,7 @@ export default function AccountClient({ user }) {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() => dispatch(togglePasswordVisibility('showConfirmPassword'))}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                     >
                       {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -377,7 +371,7 @@ export default function AccountClient({ user }) {
                     ].map(({ id, label, icon: Icon }) => (
                       <button
                         key={id}
-                        onClick={() => setTheme(id)}
+                        onClick={() => dispatch(setTheme(id))}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                           theme === id 
                             ? 'border-blue-500 bg-blue-500/20 text-blue-400' 
@@ -416,7 +410,7 @@ export default function AccountClient({ user }) {
                       <p className="text-sm text-gray-400">{description}</p>
                     </div>
                     <button
-                      onClick={() => setNotifications({...notifications, [id]: !notifications[id]})}
+                      onClick={() => dispatch(toggleNotification(id))}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         notifications[id] ? 'bg-blue-500' : 'bg-gray-600'
                       }`}
@@ -458,7 +452,7 @@ export default function AccountClient({ user }) {
                       <input
                         type="text"
                         value={deleteConfirm}
-                        onChange={(e) => setDeleteConfirm(e.target.value)}
+                        onChange={(e) => dispatch(setDeleteConfirm(e.target.value))}
                         className="w-full px-3 py-2 bg-gray-800 border border-red-700 rounded-lg focus:border-red-500 focus:outline-none"
                         placeholder="DELETE"
                       />
@@ -493,7 +487,7 @@ export default function AccountClient({ user }) {
             {tabs.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
-                onClick={() => setActiveTab(id)}
+                onClick={() => dispatch(setActiveTab(id))}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
                   activeTab === id
                     ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'

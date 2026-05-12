@@ -1,4 +1,5 @@
 import "./globals.css";
+import ReduxProvider from "@/component/ReduxProvider";
 
 export const metadata = {
   title: "Create Next App",
@@ -9,7 +10,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        {children}
+        <ReduxProvider>
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   );
