@@ -1,203 +1,419 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { Play, Pause } from "lucide-react";
+import {
+setPlaying, setShowOverlay,setCurrentTime,setDuration,setLastSaved,setResumeNotice,
+clearResumeNotice, setIsFullscreen,setErrorMessage,clearErrorMessage,setNowTick,
+setLoading,setError,clearError,resetPlayer
+} from '@/failures/videoPlayerSlice'
+import { useDispatch, useSelector } from "react-redux";
+import { error } from "console";
 
 export default function VideoPlayer({ src, autoplay = false, className = "w-full h-auto", contentId = null }) {
+  // // const videoRef = useRef(null);
+  // // const containerRef = useRef(null);
+  // // const [playing, setPlaying] = useState(false);
+  // // const [showOverlay, setShowOverlay] = useState(!autoplay);
+  // // const progressIntervalRef = useRef(null);
+  // // const [currentTime, setCurrentTime] = useState(0);
+  // // const [durationState, setDurationState] = useState(0);
+  // // const [lastSaved, setLastSaved] = useState(null);
+  // // const [resumeNotice, setResumeNotice] = useState(null);
+  // // const [isFullscreen, setIsFullscreen] = useState(false);
+  // // const [errorMessage, setErrorMessage] = useState(null);
+  // // const [nowTick, setNowTick] = useState(0);
+
+  // useEffect(() => {
+  //   if (!lastSaved) return;
+  //   // schedule initial tick (deferred) and update every second so "last saved" label is live
+  //   const init = setTimeout(() => setNowTick(Date.now()), 0);
+  //   const t = setInterval(() => setNowTick(Date.now()), 1000);
+  //   return () => {
+  //     clearInterval(t);
+  //     clearTimeout(init);
+  //   };
+  // }, [lastSaved]);
+
+  // // stable send progress helper (used by multiple handlers)
+  // const postProgress = useCallback(async (position, duration) => {
+  //   if (!contentId) return;
+  //   try {
+  //     const payload = JSON.stringify({ contentId, position, duration });
+  //     if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+  //       navigator.sendBeacon('/api/progress', payload);
+  //       setLastSaved(Date.now());
+  //       return;
+  //     }
+  //     const res = await fetch('/api/progress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
+  //     if (res?.ok) setLastSaved(Date.now());
+  //   } catch {
+  //     // ignore
+  //   }
+  // }, [contentId]);
+
+  // useEffect(() => {
+  //   const video = videoRef.current;
+  //   if (!video) return;
+
+  //   const onPlay = () => {
+  //     setPlaying(true);
+  //     setShowOverlay(false);
+  //     setErrorMessage(null);
+  //   };
+  //   const onPause = () => {
+  //     setPlaying(false);
+  //     setShowOverlay(true);
+  //   };
+  //   const onError = () => {
+  //     // Media resource failed to load or is not playable (404, wrong MIME, etc.)
+  //     setPlaying(false);
+  //     setShowOverlay(true);
+  //     setErrorMessage('Playback failed: media resource unavailable or not playable.');
+  //     console.error('Video element error', video.error);
+  //   };
+
+  //   video.addEventListener("play", onPlay);
+  //   video.addEventListener("pause", onPause);
+  //   video.addEventListener('error', onError);
+  //   const onTime = () => {
+  //     setCurrentTime(video.currentTime || 0);
+  //     setDurationState(video.duration || 0);
+  //   };
+  //   video.addEventListener('timeupdate', onTime);
+
+  //   return () => {
+  //     video.removeEventListener("play", onPlay);
+  //     video.removeEventListener("pause", onPause);
+  //     video.removeEventListener('timeupdate', onTime);
+  //     video.removeEventListener('error', onError);
+  //   };
+  // }, []);
+
+  // // Fullscreen change tracking
+  // useEffect(() => {
+  //   function onFullChange() {
+  //     setIsFullscreen(!!document.fullscreenElement);
+  //   }
+  //   document.addEventListener('fullscreenchange', onFullChange);
+  //   return () => document.removeEventListener('fullscreenchange', onFullChange);
+  // }, []);
+
+  // // Fetch last known progress for this content and seek
+  // useEffect(() => {
+  //   const video = videoRef.current;
+  //   if (!video || !contentId) return;
+
+  //   let cancelled = false;
+
+  //   async function fetchProgress() {
+  //     try {
+  //       const res = await fetch(`/api/progress?contentId=${encodeURIComponent(contentId)}`);
+  //       const json = await res.json();
+  //       if (json?.success && json.data && !cancelled) {
+  //         const pos = Number(json.data.position || 0);
+  //         if (pos > 0) {
+  //           // wait for metadata before seeking
+  //           const onLoaded = () => {
+  //             try {
+  //               video.currentTime = Math.min(pos, video.duration || pos);
+  //               // show a brief resume notice
+  //               setResumeNotice(pos);
+  //               setTimeout(() => setResumeNotice(null), 3000);
+  //             } catch {}
+  //             video.removeEventListener('loadedmetadata', onLoaded);
+  //           };
+  //           if (video.readyState >= 1) {
+  //             try { video.currentTime = Math.min(pos, video.duration || pos); } catch {}
+  //           } else {
+  //             video.addEventListener('loadedmetadata', onLoaded);
+  //           }
+  //         }
+  //       }
+  //     } catch {
+  //       // ignore
+  //     }
+  //   }
+
+  //   fetchProgress();
+
+  //   return () => { cancelled = true; };
+  // }, [contentId]);
+
+  // useEffect(() => {
+  //   const video = videoRef.current;
+  //   if (!video) return;
+  //   if (autoplay) {
+  //     const p = video.play();
+  //     if (p && typeof p.then === "function") {
+  //       p.catch(() => {
+  //         // autoplay blocked — show overlay so user can start playback
+  //         setShowOverlay(true);
+  //       });
+  //     }
+  //   }
+  //   // start periodic progress reporting when component mounts
+
+  //   if (contentId) {
+  //     progressIntervalRef.current = setInterval(() => {
+  //       const v = videoRef.current;
+  //       if (!v) return;
+  //       postProgress(v.currentTime || 0, v.duration || null);
+  //     }, 5000);
+
+  //     const handlePause = () => {
+  //       const v = videoRef.current;
+  //       if (!v) return;
+  //       postProgress(v.currentTime || 0, v.duration || null);
+  //     };
+
+  //     window.addEventListener('pagehide', handlePause);
+  //     window.addEventListener('beforeunload', handlePause);
+  //     video.addEventListener('pause', handlePause);
+
+  //     // cleanup
+  //     return () => {
+  //       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+  //       window.removeEventListener('pagehide', handlePause);
+  //       window.removeEventListener('beforeunload', handlePause);
+  //       try { video.removeEventListener('pause', handlePause); } catch {}
+  //     };
+  //   }
+  // }, [autoplay, contentId, postProgress]);
+
+  // function togglePlay(e) {
+  //   e?.preventDefault();
+  //   const video = videoRef.current;
+  //   if (!video) return;
+  //   if (video.paused) {
+  //     const p = video.play();
+  //     if (p && typeof p.then === 'function') {
+  //       p.catch((err) => {
+  //         console.error('Play failed', err);
+  //         setErrorMessage('Unable to start playback. Tap play to try again.');
+  //         setShowOverlay(true);
+  //       });
+  //     }
+  //   } else {
+  //     video.pause();
+  //   }
+  // }
+
+  // function formatTime(s) {
+  //   if (!s || isNaN(s) || !isFinite(s)) return "0:00";
+  //   const sec = Math.floor(s % 60).toString().padStart(2, '0');
+  //   const min = Math.floor(s / 60);
+  //   return `${min}:${sec}`;
+  // }
+  // const lastSavedLabel = useMemo(() => {
+  //   if (!lastSaved) return null;
+  //   if (!nowTick) return 'just now';
+  //   const diff = Math.floor((nowTick - lastSaved) / 1000);
+  //   if (diff < 5) return 'just now';
+  //   if (diff < 60) return `${diff}s ago`;
+  //   const m = Math.floor(diff / 60);
+  //   return `${m}m ago`;
+  // }, [lastSaved, nowTick]);
+
+  // function onSeekChange(e) {
+  //   const val = Number(e.target.value);
+  //   const video = videoRef.current;
+  //   if (!video || isNaN(val)) return;
+  //   // while dragging, update UI immediately
+  //   setCurrentTime(val);
+  //   video.currentTime = val;
+  // }
+
+  // function onSeekPointerDown() {
+  //   // show overlay while interacting
+  //   setShowOverlay(true);
+  // }
+
+  // function onSeekPointerUp() {
+  //   const video = videoRef.current;
+  //   if (!video) return;
+  //   postProgress(video.currentTime || 0, video.duration || null);
+  // }
+
+  // async function toggleFullscreen() {
+  //   try {
+  //     if (!document.fullscreenElement) {
+  //       const el = containerRef.current || videoRef.current;
+  //       if (el && el.requestFullscreen) {
+  //         await el.requestFullscreen();
+  //       }
+  //     } else {
+  //       if (document.exitFullscreen) await document.exitFullscreen();
+  //     }
+  //   } catch {
+  //     // ignore errors
+  //   }
+  // }
+
+  const dispatch = useDispatch();
   const videoRef = useRef(null);
   const containerRef = useRef(null);
-  const [playing, setPlaying] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(!autoplay);
   const progressIntervalRef = useRef(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [durationState, setDurationState] = useState(0);
-  const [lastSaved, setLastSaved] = useState(null);
-  const [resumeNotice, setResumeNotice] = useState(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [nowTick, setNowTick] = useState(0);
 
-  useEffect(() => {
-    if (!lastSaved) return;
-    // schedule initial tick (deferred) and update every second so "last saved" label is live
-    const init = setTimeout(() => setNowTick(Date.now()), 0);
-    const t = setInterval(() => setNowTick(Date.now()), 1000);
-    return () => {
-      clearInterval(t);
-      clearTimeout(init);
-    };
-  }, [lastSaved]);
+  const {
+    playing,showOverlay,currentTime,duration,lastSaved, resumeNotice,
+    isFullscreen,errorMessage,nowTick
+  } = useSelector((store)=>store.videoPlayer)
 
-  // stable send progress helper (used by multiple handlers)
-  const postProgress = useCallback(async (position, duration) => {
-    if (!contentId) return;
-    try {
-      const payload = JSON.stringify({ contentId, position, duration });
-      if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
-        navigator.sendBeacon('/api/progress', payload);
-        setLastSaved(Date.now());
-        return;
-      }
-      const res = await fetch('/api/progress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
-      if (res?.ok) setLastSaved(Date.now());
-    } catch {
-      // ignore
-    }
-  }, [contentId]);
+  //seting overlay for autoplay
+useEffect(()=>{
+  dispatch(setShowOverlay(!autoplay));
+},[autoplay, dispatch]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+useEffect(()=>{
+  if(!lastSaved)return;
+  const init = setTimeout(()=>dispatch(setNowTick(Date.now())), 0);
+  const t = setInterval(()=> dispatch(setNowTick(Date.now)), 1000)
+  return ()=>{
+    clearInterval(t);
+    clearTimeout(init);
+  }
+}, [lastSaved, dispatch]);
 
-    const onPlay = () => {
-      setPlaying(true);
-      setShowOverlay(false);
-      setErrorMessage(null);
-    };
-    const onPause = () => {
-      setPlaying(false);
-      setShowOverlay(true);
-    };
-    const onError = () => {
-      // Media resource failed to load or is not playable (404, wrong MIME, etc.)
-      setPlaying(false);
-      setShowOverlay(true);
-      setErrorMessage('Playback failed: media resource unavailable or not playable.');
-      console.error('Video element error', video.error);
-    };
+//helper for sender progress
+const postProgress = useCallback(async(position, dur)=>{
+  if (!contentId) return;
 
-    video.addEventListener("play", onPlay);
-    video.addEventListener("pause", onPause);
-    video.addEventListener('error', onError);
-    const onTime = () => {
-      setCurrentTime(video.currentTime || 0);
-      setDurationState(video.duration || 0);
-    };
-    video.addEventListener('timeupdate', onTime);
+  dispatch(setLoading(true));
+  try{
+    await saveProgress(contentId, position,dur);
+    dispatch(setLastSaved(Date.now()));
+  }catch(error){
+    dispatch(setError(error.message));
+  }finally{
+    dispatch(setLoading(false));
+  }
+}, [contentId, dispatch]);
 
-    return () => {
-      video.removeEventListener("play", onPlay);
-      video.removeEventListener("pause", onPause);
-      video.removeEventListener('timeupdate', onTime);
-      video.removeEventListener('error', onError);
-    };
-  }, []);
+//Video event Listeners
+useEffect(()=>{
+  const video = videoRef.current;
+  if(!video) return;
 
-  // Fullscreen change tracking
-  useEffect(() => {
-    function onFullChange() {
-      setIsFullscreen(!!document.fullscreenElement);
-    }
-    document.addEventListener('fullscreenchange', onFullChange);
-    return () => document.removeEventListener('fullscreenchange', onFullChange);
-  }, []);
+  const onPlay= ()=>{
+    dispatch(setPlaying(true))
+    dispatch(clearErrorMessage());
+  };
+  const onPause =()=>{
+    dispatch(setPlaying(false));
+  } ;
+  const onError = ()=>{
+    dispatch(setErrorMessage('Playing failed: media resource unavailable or not playable.'));
+    console.error("Video element error", video.error);
+  };
+  const onTime = ()=>{
+    dispatch(setCurrentTime(video.currentTime || 0));
+    dispatch(setDuration(video.duration || 0))
+  };
 
-  // Fetch last known progress for this content and seek
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !contentId) return;
+  video.addEventListener("play", onPlay);
+  video.addEventListener('pause', onPause);
+  video.addEventListener('error', onError);
+  video.addEventListener('timeupdate', onTime);
 
-    let cancelled = false;
+  return()=>{
+    video.removeEventListener('play', onPlay);
+    video.removeEventListener('pause', onPause);
+    video.removeEventListener('timeupdate', onTime);
+    video.removeEventListener('error', onError);
+  }
+},[dispatch]);
 
-    async function fetchProgress() {
-      try {
-        const res = await fetch(`/api/progress?contentId=${encodeURIComponent(contentId)}`);
-        const json = await res.json();
-        if (json?.success && json.data && !cancelled) {
-          const pos = Number(json.data.position || 0);
-          if (pos > 0) {
-            // wait for metadata before seeking
-            const onLoaded = () => {
-              try {
-                video.currentTime = Math.min(pos, video.duration || pos);
-                // show a brief resume notice
-                setResumeNotice(pos);
-                setTimeout(() => setResumeNotice(null), 3000);
-              } catch {}
-              video.removeEventListener('loadedmetadata', onLoaded);
-            };
-            if (video.readyState >= 1) {
-              try { video.currentTime = Math.min(pos, video.duration || pos); } catch {}
-            } else {
-              video.addEventListener('loadedmetadata', onLoaded);
-            }
-          }
+// Fullscreen Tracking changes
+useEffect(()=>{
+  function onFullChange(){
+    dispatch(setIsFullscreen(!!document.fullscreenElement));
+  };
+  document.addEventListener('fullscreenchange', onFullChange)
+  return ()=> document.removeEventListener('fullscreenchange', onFullChange);
+},[dispatch])
+
+//fetching last known progress
+useEffect(()=>{
+  const video = videoRef.current;
+  if(!video || contentId) return;
+  let cancelled = false;
+  async function loadProgress() {
+    try{
+      const data = await fetchProgress(contentId);
+      if(data && !cancelled && data.position > 0){
+        const onLoaded =()=>{
+          try{
+            video.currentTime = Math.min(data.position, video.duration || data.position);
+            dispatch(setResumeNotice(data));
+            setTimeout(()=>dispatch(clearResumeNotice()), 3000);
+          }catch{}
+          video,removeEventListener('loadedmetadata', onLoaded)
         }
-      } catch {
-        // ignore
       }
+    }catch(error){
+      dispatch(setError(error.message));
+    }finally{
+      dispatch(setLoading(false))
     }
+  }
+  loadProgress();
+  return ()=>{cancelled = true};
+},[contentId,dispatch])
 
-    fetchProgress();
-
-    return () => { cancelled = true; };
-  }, [contentId]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (autoplay) {
-      const p = video.play();
-      if (p && typeof p.then === "function") {
-        p.catch(() => {
-          // autoplay blocked — show overlay so user can start playback
-          setShowOverlay(true);
-        });
-      }
-    }
-    // start periodic progress reporting when component mounts
-
-    if (contentId) {
-      progressIntervalRef.current = setInterval(() => {
-        const v = videoRef.current;
-        if (!v) return;
-        postProgress(v.currentTime || 0, v.duration || null);
-      }, 5000);
-
-      const handlePause = () => {
-        const v = videoRef.current;
-        if (!v) return;
-        postProgress(v.currentTime || 0, v.duration || null);
-      };
-
-      window.addEventListener('pagehide', handlePause);
-      window.addEventListener('beforeunload', handlePause);
-      video.addEventListener('pause', handlePause);
-
-      // cleanup
-      return () => {
-        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-        window.removeEventListener('pagehide', handlePause);
-        window.removeEventListener('beforeunload', handlePause);
-        try { video.removeEventListener('pause', handlePause); } catch {}
-      };
-    }
-  }, [autoplay, contentId, postProgress]);
-
-  function togglePlay(e) {
-    e?.preventDefault();
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      const p = video.play();
-      if (p && typeof p.then === 'function') {
-        p.catch((err) => {
-          console.error('Play failed', err);
-          setErrorMessage('Unable to start playback. Tap play to try again.');
-          setShowOverlay(true);
-        });
-      }
-    } else {
-      video.pause();
+//Autoplay and progress reporting
+useEffect(()=>{
+  const video = videoRef.current;
+  if(!video)return;
+  if(autoplay){
+    const p = video.play();
+    if(p && typeof p.then === 'function'){
+      p.catch(()=>{
+        dispatch(setShowOverlay(true))
+      })
     }
   }
 
-  function formatTime(s) {
-    if (!s || isNaN(s) || !isFinite(s)) return "0:00";
-    const sec = Math.floor(s % 60).toString().padStart(2, '0');
-    const min = Math.floor(s / 60);
-    return `${min}:${sec}`;
+  if (contentId){
+    progressIntervalRef.current = setInterval(()=>{
+      const v = video.current;
+      if (!v)return
+      postProgress(v.currentTime || 0, v.duration || null);
+    }, 5000);
+    const handlePause =()=>{
+      const v = videoRef.current
+      if(!v) return;
+      postProgress(v.currentTime || 0, v.duration || null);
+    }
+
+    window.addEventListener('pagehide', handlePause);
+    window.addEventListener('beforeunload', handlePause);
+    window.addEventListener('pause', handlePause);
+
+    return ()=>{
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      window.removeEventListener('pagehide', handlePause)
+      window.removeEventListener('beforeunload', handlePause)
+      try{
+        video.removeEventListener('pause', handlePause);}catch{}
+    };
   }
-  const lastSavedLabel = useMemo(() => {
+},[autoplay,contentId, postProgress,dispatch]);
+
+function togglePlay(e){
+  e?.preventDefault();
+  const video=videoRef.current;
+  if(!video)return;
+  if(video.pause){
+    const p = video.play();
+    if(p && typeof p.then === 'function'){
+      console.error('Play Failed', err)
+     dispatch(setErrorMessage('Unable to start playback. Tap play to try again.'));
+    }
+  }else{
+    video.pause();
+  }
+}
+const lastSavedLabel = useMemo(() => {
     if (!lastSaved) return null;
     if (!nowTick) return 'just now';
     const diff = Math.floor((nowTick - lastSaved) / 1000);
@@ -211,14 +427,12 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
     const val = Number(e.target.value);
     const video = videoRef.current;
     if (!video || isNaN(val)) return;
-    // while dragging, update UI immediately
-    setCurrentTime(val);
+    dispatch(setCurrentTime(val));
     video.currentTime = val;
   }
 
   function onSeekPointerDown() {
-    // show overlay while interacting
-    setShowOverlay(true);
+    dispatch(setShowOverlay(true));
   }
 
   function onSeekPointerUp() {
@@ -237,9 +451,7 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
       } else {
         if (document.exitFullscreen) await document.exitFullscreen();
       }
-    } catch {
-      // ignore errors
-    }
+    } catch {}
   }
 
   return (
