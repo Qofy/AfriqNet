@@ -1,12 +1,25 @@
 "use client"
 import { Search } from "lucide-react";
 import { useState } from "react";
+import { useSearchContent } from "@/features/contentBrowserSlice";
 
-export default function SearchBar({ value, onChange, placeholder = "Search movies..." }) {
+export default function SearchBar({
+  value,
+  onChange,
+  placeholder = "Search movies...",
+  enableGlobalSearch = false,
+  contentType = 'all'
+}) {
   // Support controlled usage (pass `value` + `onChange`) or uncontrolled local state
   const [local, setLocal] = useState("");
   const isControlled = value !== undefined;
   const val = isControlled ? value : local;
+
+  // Use global search if enabled
+  const { data: globalResults = [] } = useSearchContent(
+    enableGlobalSearch && val ? val : "",
+    contentType
+  );
 
   const handleChange = (e) => {
     const v = e.target.value;
@@ -31,6 +44,24 @@ export default function SearchBar({ value, onChange, placeholder = "Search movie
         className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a2cbf9]"
         size={18}
       />
+
+      {enableGlobalSearch && globalResults.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a2e] border border-[#a2cbf9]/30 rounded-lg shadow-lg max-h-64 overflow-y-auto z-50">
+          {globalResults.slice(0, 5).map((result) => (
+            <div
+              key={result.id}
+              className="px-4 py-2 hover:bg-[#a2cbf9]/10 cursor-pointer text-[#a2cbf9] text-sm"
+            >
+              {result.title || result.name}
+            </div>
+          ))}
+          {globalResults.length > 5 && (
+            <div className="px-4 py-2 text-center text-[#a2cbf9]/60 text-xs">
+              +{globalResults.length - 5} more results
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

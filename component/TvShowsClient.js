@@ -7,10 +7,12 @@ import { useSearchParams } from "next/navigation";
 import { Star, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
 import MoviesGrid from "@/component/MoviesGrid";
+import { useTvShows } from "@/features/contentBrowserSlice";
 
 export default function TVShowsClient({ initialShows = [], genres = { tv: [] } }) {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   const initialGenre = useMemo(() => {
     const genreParam = searchParams.get("genre");
@@ -19,7 +21,10 @@ export default function TVShowsClient({ initialShows = [], genres = { tv: [] } }
 
   const [activeGenre, setActiveGenre] = useState(initialGenre);
 
-  const filtered = initialShows.filter((show) => {
+  const { data: showsData = [], isLoading, error } = useTvShows(page);
+  const shows = showsData.length > 0 ? showsData : initialShows;
+
+  const filtered = shows.filter((show) => {
     const matchesSearch = (show.name || "").toLowerCase().includes(search.toLowerCase());
     const matchesGenre = activeGenre === null || (show.genre_ids || []).includes(activeGenre);
     return matchesSearch && matchesGenre;
@@ -32,7 +37,10 @@ export default function TVShowsClient({ initialShows = [], genres = { tv: [] } }
       <div className="bg-var(--background) py-18 px-6">
         <div className="container mx-auto max-w-6xl">
           <h1 className="text-4xl font-bold text-white mb-2">TV Shows</h1>
-          <p className="text-[#a2cbf9]">{initialShows.length} shows available</p>
+          <p className="text-[#a2cbf9]">
+            {isLoading ? "Loading..." : `${shows.length} shows available`}
+          </p>
+          {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
 
           <SearchBar value={search} onChange={(v) => setSearch(v)} />
         </div>
@@ -68,8 +76,31 @@ export default function TVShowsClient({ initialShows = [], genres = { tv: [] } }
           {search && ` for "${search}"`}
         </p>
 
-        {filtered.length > 0 ? (
-          <MoviesGrid movies={filtered} />
+        {isLoading ? (
+          <div className="text-center py-24">
+            <p className="text-[#a2cbf9] text-lg">Loading shows...</p>
+          </div>
+        ) : filtered.length > 0 ? (
+          <>
+            <MoviesGrid movies={filtered} />
+            {page > 1 && (
+              <div className="flex justify-center gap-4 mt-8">
+                <button
+                  onClick={() => setPage(page - 1)}
+                  className="px-4 py-2 rounded-lg bg-[#006eeb] text-white hover:bg-[#005bc4] transition"
+                >
+                  Previous
+                </button>
+                <span className="px-4 py-2 text-[#a2cbf9]">Page {page}</span>
+                <button
+                  onClick={() => setPage(page + 1)}
+                  className="px-4 py-2 rounded-lg bg-[#006eeb] text-white hover:bg-[#005bc4] transition"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-24">
             <Star size={48} className="text-[#fd536a]/50 mx-auto mb-4" />

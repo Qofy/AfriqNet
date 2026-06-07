@@ -5,10 +5,12 @@ import { useSearchParams } from "next/navigation";
 import { Clapperboard, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
 import MoviesGrid from "@/component/MoviesGrid";
+import { useMusicVideos } from "@/features/contentBrowserSlice";
 
 export default function MusicVideosClient({ initialVideos = [], genres = { music: [] } }) {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   // Get initial genre from URL query parameter
   const initialGenre = useMemo(() => {
@@ -18,7 +20,10 @@ export default function MusicVideosClient({ initialVideos = [], genres = { music
 
   const [activeGenre, setActiveGenre] = useState(initialGenre);
 
-  const filtered = initialVideos.filter((video) => {
+  const { data: videosData = [], isLoading, error } = useMusicVideos(page);
+  const videos = videosData.length > 0 ? videosData : initialVideos;
+
+  const filtered = videos.filter((video) => {
     const title = video.title || "";
     const artist = video.artist || "";
     const matchesSearch =
@@ -36,7 +41,10 @@ export default function MusicVideosClient({ initialVideos = [], genres = { music
       <div className="bg-var(--background) py-18 px-6">
         <div className="container mx-auto max-w-6xl">
           <h1 className="text-4xl font-bold text-white mb-2">Music Videos</h1>
-          <p className="text-[#a2cbf9]">{initialVideos.length} videos available</p>
+          <p className="text-[#a2cbf9]">
+            {isLoading ? "Loading..." : `${videos.length} videos available`}
+          </p>
+          {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
 
           {/* Search */}
           <div className="mt-4">
@@ -78,8 +86,31 @@ export default function MusicVideosClient({ initialVideos = [], genres = { music
         </p>
 
         {/* Grid */}
-        {filtered.length > 0 ? (
-          <MoviesGrid movies={filtered} />
+        {isLoading ? (
+          <div className="text-center py-24">
+            <p className="text-[#a2cbf9] text-lg">Loading music videos...</p>
+          </div>
+        ) : filtered.length > 0 ? (
+          <>
+            <MoviesGrid movies={filtered} />
+            {page > 1 && (
+              <div className="flex justify-center gap-4 mt-8">
+                <button
+                  onClick={() => setPage(page - 1)}
+                  className="px-4 py-2 rounded-lg bg-[#006eeb] text-white hover:bg-[#005bc4] transition"
+                >
+                  Previous
+                </button>
+                <span className="px-4 py-2 text-[#a2cbf9]">Page {page}</span>
+                <button
+                  onClick={() => setPage(page + 1)}
+                  className="px-4 py-2 rounded-lg bg-[#006eeb] text-white hover:bg-[#005bc4] transition"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-24">
             <Clapperboard size={48} className="text-[#fd536a]/50 mx-auto mb-4" />
