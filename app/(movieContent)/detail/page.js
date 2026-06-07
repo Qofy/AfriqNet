@@ -15,7 +15,13 @@ export default async function DetailPage({ searchParams }) {
   const allContent = [...sampleMovies, ...sampleTVShows, ...sampleMusicVideos];
   const movie = allContent.find((item) => item.id === movieId) || sampleMovies[0];
 
-  // Related/similar movies
+  // Derive content type for DetailTabs
+  const contentType = sampleMusicVideos.some((m) => m.id === movie.id)
+    ? 'music'
+    : sampleTVShows.some((t) => t.id === movie.id)
+    ? 'tv'
+    : 'movie';
+
   // Related: pick other movies that share at least one genre with the current movie
   const relatedMovies = sampleMovies.filter(m => {
     if (!movie || !m || m.id === movie.id) return false;
@@ -23,6 +29,14 @@ export default async function DetailPage({ searchParams }) {
     const b = m.genre_ids || [];
     return a.some(g => b.includes(g));
   }).slice(0, 6);
+
+  // Related music videos (for music contentType)
+  const relatedMusic = sampleMusicVideos.filter((m) => {
+    if (!movie || m.id === movie.id) return false;
+    const a = movie.genre_ids || [];
+    const b = m.genre_ids || [];
+    return a.some((g) => b.includes(g));
+  }).slice(0, 8);
 
   // Sample cast data (server-side)
   const cast = [
@@ -47,7 +61,13 @@ export default async function DetailPage({ searchParams }) {
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8 max-w-7xl">
         {/* Tabs (client) - passes server data as props */}
-        <DetailTabs movie={movie} episodes={episodes} cast={cast} />
+        <DetailTabs
+          movie={movie}
+          episodes={episodes}
+          cast={cast}
+          contentType={contentType}
+          relatedMusic={relatedMusic}
+        />
 
         {/* Similar/Related Section */}
         <MovieRow title="More Like This" movies={relatedMovies} showSeeAll={false} />

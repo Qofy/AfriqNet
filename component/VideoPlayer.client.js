@@ -16,9 +16,9 @@ export default function VideoPlayer({ src, autoplay = false, className = "w-full
   const progressIntervalRef = useRef(null);
 
   const {
-    playing,showOverlay,currentTime,lastSaved, resumeNotice,
+    playing,showOverlay,currentTime,duration,lastSaved, resumeNotice,
     isFullscreen,errorMessage,nowTick
-  } = useSelector((store)=>store.videoPlayer)
+  } = useSelector((store) => store.videoplayer)
 
   //seting overlay for autoplay
 useEffect(()=>{
@@ -182,7 +182,14 @@ function togglePlay(e){
     video.pause();
   }
 }
-const lastSavedLabel = useMemo(() => {
+  function formatTime(s) {
+    if (!s || isNaN(s) || !isFinite(s)) return "0:00";
+    const sec = Math.floor(s % 60).toString().padStart(2, '0');
+    const min = Math.floor(s / 60);
+    return `${min}:${sec}`;
+  }
+
+  const lastSavedLabel = useMemo(() => {
     if (!lastSaved) return null;
     if (!nowTick) return 'just now';
     const diff = Math.floor((nowTick - lastSaved) / 1000);
@@ -247,7 +254,7 @@ const lastSavedLabel = useMemo(() => {
 
       {/* Top-right time / saved badge */}
       <div className="absolute right-2 top-2 sm:right-4 sm:top-4 bg-black/50 text-white px-2 py-1 rounded-md text-xs sm:text-sm backdrop-blur-sm flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-3">
-        <div className="font-medium">{formatTime(currentTime)} / {formatTime(durationState)}</div>
+        <div className="font-medium">{formatTime(currentTime)} / {formatTime(duration)}</div>
         <div className="text-2xs sm:text-xs text-white/80">{lastSavedLabel ? `Saved ${lastSavedLabel}` : 'Unsaved'}</div>
       </div>
 
@@ -268,7 +275,7 @@ const lastSavedLabel = useMemo(() => {
         <input
           type="range"
           min={0}
-          max={durationState || 0}
+          max={duration || 0}
           value={currentTime}
           onChange={onSeekChange}
           onPointerDown={onSeekPointerDown}

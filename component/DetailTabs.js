@@ -4,51 +4,50 @@ import { useState } from "react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 
-export default function DetailTabs({ movie, episodes = [], cast = [] }) {
-  const [active, setActive] = useState("overview");
+const TABS_BY_TYPE = {
+  music: ["overview", "related"],
+  movie: ["overview", "cast", "episodes"],
+  tv:    ["overview", "cast", "episodes"],
+};
+
+const TAB_LABELS = {
+  overview: "Overview",
+  cast:     "Cast & Crew",
+  episodes: "Episodes",
+  related:  "Related Music",
+};
+export default function DetailTabs({ 
+  movie, 
+  episodes = [],
+   cast = [],
+   relatedMusic=[],
+   contentType = "movie"  // "movie" | "tv" | "music"
+}) {
+  const tabs = TABS_BY_TYPE[contentType] ?? TABS_BY_TYPE.movie;
+  const [active, setActive] = useState(tabs[0]);
 
   return (
     <div>
+      {/* Tab bar — only renders tabs valid for this contentType */}
       <div className="border-b border-white/10 mb-8">
         <div className="flex gap-8">
-          <button
-            onClick={() => setActive("overview")}
-            className={`pb-4 px-2 font-semibold transition-colors relative ${
-              active === "overview" ? "text-white" : "text-white/50 hover:text-white/80"
-            }`}
-          >
-            Overview
-            {active === "overview" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 btn-color"></div>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActive("episodes")}
-            className={`pb-4 px-2 font-semibold transition-colors relative ${
-              active === "episodes" ? "text-white" : "text-white/50 hover:text-white/80"
-            }`}
-          >
-            Episodes
-            {active === "episodes" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 btn-color"></div>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActive("cast")}
-            className={`pb-4 px-2 font-semibold transition-colors relative ${
-              active === "cast" ? "text-white" : "text-white/50 hover:text-white/80"
-            }`}
-          >
-            Cast & Crew
-            {active === "cast" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 btn-color"></div>
-            )}
-          </button>
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActive(tab)}
+              className={`pb-4 px-2 font-semibold transition-colors relative ${
+                active === tab ? "text-white" : "text-white/50 hover:text-white/80"
+              }`}
+            >
+              {TAB_LABELS[tab]}
+              {active === tab && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 btn-color" />
+              )}
+            </button>
+          ))}
         </div>
       </div>
-
+          {/*Panels*/}
       <div>
         {active === "overview" && (
           <div className="space-y-8">
@@ -56,17 +55,37 @@ export default function DetailTabs({ movie, episodes = [], cast = [] }) {
               <h2 className="text-2xl font-bold mb-4">Overview</h2>
               <p className="text-white/80 text-lg leading-relaxed">{movie.overview}</p>
             </div>
-
             <div>
               <h3 className="text-xl font-bold mb-3">Genres</h3>
               <div className="flex flex-wrap gap-2">
-                {movie.genre_ids && movie.genre_ids.map((id, index) => (
+                {movie.genre_ids?.map((id, index) => (
                   <span key={index} className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm transition-colors">
                     Genre {id}
                   </span>
                 ))}
               </div>
             </div>
+          </div>
+        )}
+
+         {active === "related" && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Related Music</h2>
+            {relatedMusic.length === 0 ? (
+              <p className="text-white/50">No related music found.</p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {relatedMusic.map((item) => (
+                  <div key={item.id} className="bg-white/5 hover:bg-white/10 rounded-lg p-4 transition-all cursor-pointer">
+                    <div className="relative aspect-square rounded overflow-hidden mb-3">
+                      <Image src={item.poster} alt={item.title} fill className="object-cover" />
+                    </div>
+                    <h3 className="font-semibold text-sm">{item.title}</h3>
+                    <p className="text-white/60 text-xs">{item.artist}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
