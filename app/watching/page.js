@@ -2,8 +2,7 @@ import { getMovieById, getMusicVideoById } from '@/lib/db.server';
 import { verifyAuth } from '../../lib/auth';
 import { redirect } from 'next/navigation';
 import VideoPlayer from '../../component/VideoPlayer.client';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import BackButton from '../../component/BackButton';
 
 export default async function WatchingPage({ searchParams }) {
   const params = await searchParams;
@@ -56,10 +55,7 @@ export default async function WatchingPage({ searchParams }) {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto px-0 py-8 max-w-7xl">
-        <Link href="/home" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4">
-                    <ArrowLeft size={20} />
-                    <span>Back to Home</span>
-                  </Link>
+        <BackButton />
         <h1 className="text-2xl font-bold mb-4 px-6">Now Playing: {title}</h1>
 
         {/* Full-bleed video using client player with custom controls */}
