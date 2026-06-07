@@ -255,7 +255,7 @@ function togglePlay(e){
       {/* Top-right time / saved badge */}
       <div className="absolute right-2 top-2 sm:right-4 sm:top-4 bg-black/50 text-white px-2 py-1 rounded-md text-xs sm:text-sm backdrop-blur-sm flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-3">
         <div className="font-medium">{formatTime(currentTime)} / {formatTime(duration)}</div>
-        <div className="text-2xs sm:text-xs text-white/80">{lastSavedLabel ? `Saved ${lastSavedLabel}` : 'Unsaved'}</div>
+        <div className="text-2xs sm:text-xs text-white/80">{lastSavedLabel ? `Saved ${lastSavedLabel}` : ''}</div>
       </div>
 
       {/* Resume notice */}
