@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import { setError } from "./accountSlice";
-// import { error } from "console";
-// import { act } from "react";
+import { useDispatch } from "react-redux";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import axios from "axios";
 
 const initialState ={
     playing:false,
@@ -98,32 +98,96 @@ export const {
   resetPlayer
 } = videoPlayerSlice.actions;
 
-export async function fetchProgress(contentId){
-    const res = await fetch(`/api/progress?contentId=${encodeURIComponent(contentId)}`);
-    const json = await res.json();
-    if(json?.success && json.data){
-        return{
-            position:Number(json.data.position || 0),
-            duration:Number(json.data.duration || 0)
-        };
-    }
-    return null;
+
+const fetchProgressApi = async (contentId) => {
+  const { data } = await axios.get(
+    `/api/progress?contentId=${encodeURIComponent(contentId)}`
+  );
+  if (data?.success && data.data) {
+    return {
+      position: Number(data.data.position || 0),
+      duration: Number(data.data.duration || 0),
+    };
+  }
+  return null;
+};
+
+const saveProgressApi = async ({ contentId, position, duration }) => {
+  if (
+    typeof navigator !== "undefined" &&
+    typeof navigator.sendBeacon === "function"
+  ) {
+    navigator.sendBeacon(
+      "/api/progress",
+      JSON.stringify({ contentId, position, duration })
+    );
+    return { success: true };
+  }
+  const { data } = await axios.post("/api/progress", {
+    contentId,
+    position,
+    duration,
+  });
+  return data;
+};
+
+// ─── React Query hooks ────────────────────────────────────────────────────────
+
+/**
+ * useProgressQuery(contentId)
+ * Fetches the saved position for a piece of content and dispatches
+ * setResumeNotice so the VideoPlayer can seek on load.
+ *
+ * Usage (inside VideoPlayer):
+ *   const { data, isLoading } = useProgressQuery(contentId);
+ */
+export function useProgressQuery(contentId) {
+  const dispatch = useDispatch();
+
+  return useQuery({
+    queryKey: ["progress", contentId],
+    queryFn: () => fetchProgressApi(contentId),
+    enabled: !!contentId,          
+    staleTime: Infinity,          
+    onSuccess: (data) => {
+      if (data?.position > 0) {
+        dispatch(setResumeNotice(data.position));
+      }
+    },
+    onError: (err) => {
+      dispatch(setError(err?.response?.data?.error || err.message));
+    },
+  });
 }
 
-export async function saveProgress(contentId, position, duration) {
-    const payload = JSON.stringify({ contentId, position, duration });
-    if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-        navigator.sendBeacon("/api/progress", payload);
-        return { success: true };
-    }
-    const res = await fetch("/api/progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: payload,
-    });
-    if (!res.ok) {
-        throw new Error("Failed to save progress");
-    }
-    return { success: true };
+/**
+ * useSaveProgress()
+ * Returns a mutate function that POSTs watch progress.
+ * Keeps the last-saved timestamp in Redux on success.
+ *
+ * Usage (inside VideoPlayer):
+ *   const { saveProgress } = useSaveProgress();
+ *   saveProgress({ contentId, position, duration });
+ */
+export function useSaveProgress() {
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: saveProgressApi,
+    onSuccess: (_data, variables) => {
+      dispatch(setLastSaved(Date.now()));
+      queryClient.invalidateQueries({ queryKey: ["progress", variables.contentId] });
+    },
+    onError: (err) => {
+      dispatch(setError(err?.response?.data?.error || err.message));
+    },
+  });
+
+  return {
+    saveProgress: mutation.mutate,
+    isLoading: mutation.isPending,
+  };
 }
-export default videoPlayerSlice.reducer
+
+export default videoPlayerSlice.reducer;
