@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { Home, Film, Tv, List, Music, User, Camera } from "lucide-react";
-import { logout } from "@/actions/auth-action";
+// import { logout } from "@/actions/auth-action";
 
 export default function GeneralHeaderClient({ authverification }) {
   const [scrolled, setScrolled] = useState(false);

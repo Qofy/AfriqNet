@@ -1,4 +1,4 @@
-import { verifyAuth } from '@/lib/auth';
+// import { verifyAuth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { getUserById } from '@/lib/db.server';
 import AccountClient from '@/component/AccountClient';
@@ -9,11 +9,11 @@ export const metadata = {
 };
 
 export default async function AccountPage() {
-  const { session, user } = await verifyAuth();
+  // const { session, user } = await verifyAuth();
   
-  if (!session || !user) {
-    redirect('/login');
-  }
+  // if (!session || !user) {
+  //   redirect('/login');
+  // }
 
   // Get fresh user data from database
   const userData = getUserById(user.id);

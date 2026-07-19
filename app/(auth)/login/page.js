@@ -1,46 +1,10 @@
 "use client";
 
-import { useState, useActionState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
-import { signin } from "../../../actions/auth-action";
+import { Eye, Mail, Lock, ArrowRight } from "lucide-react";
+
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [formState, formAction] = useActionState(signin,{})
-
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Login data:", { ...formData, rememberMe });
-      setIsLoading(false);
-      // Redirect to home page
-      // router.push('/home');
-    }, 1500);
-  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center px-4 py-12">
@@ -63,7 +27,7 @@ export default function LoginPage() {
 
         {/* Form */}
         <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
-          <form action={formAction} className="space-y-5">
+          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
@@ -75,15 +39,11 @@ export default function LoginPage() {
                   type="email"
                   id="email"
                   name="email"
-                  className={`w-full bg-white/10 border ${
-                    formState.errors ? "border-red-500" : "border-white/20"
-                  } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
+                  disabled
+                  className={`w-full bg-white/10 border border-white/20 rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors opacity-50 cursor-not-allowed`}
                   placeholder="you@example.com"
                 />
               </div>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
             </div>
 
             {/* Password Field */}
@@ -102,26 +62,21 @@ export default function LoginPage() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type="password"
                   id="password"
                   name="password"
-                  
-                  className={`w-full bg-white/10 border ${
-                    formState.errors ? "border-red-500" : "border-white/20"
-                  } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
+                  disabled
+                  className={`w-full bg-white/10 border border-white/20 rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors opacity-50 cursor-not-allowed`}
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  disabled
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors opacity-50 cursor-not-allowed"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  <Eye size={20} />
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-              )}
             </div>
 
             {/* Remember Me */}
@@ -129,36 +84,22 @@ export default function LoginPage() {
               <input
                 type="checkbox"
                 id="rememberMe"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-white/20 bg-white/10 text-[#006eeb] focus:ring-[#006eeb] focus:ring-offset-0 cursor-pointer"
+                disabled
+                className="w-4 h-4 rounded border-white/20 bg-white/10 text-[#006eeb] focus:ring-[#006eeb] focus:ring-offset-0 cursor-not-allowed opacity-50"
               />
-              <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-300 cursor-pointer">
+              <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-300 opacity-50">
                 Remember me for 30 days
               </label>
             </div>
-               {formState.errors && (<ul id="form-error">
-                {Object.keys(formState.errors).map((error)=>(<li key={error}>
-                  {formState.errors[error]}
-                </li>))}
-              </ul>)}
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full btn-color btn-hover text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled
+              className="w-full btn-color btn-hover text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
             >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Signing In...
-                </>
-              ) : (
-                <>
-                  Sign In
-                  <ArrowRight size={20} />
-                </>
-              )}
+              Sign In
+              <ArrowRight size={20} />
             </button>
           </form>
 
