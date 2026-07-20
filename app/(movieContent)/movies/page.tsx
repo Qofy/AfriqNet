@@ -8,11 +8,11 @@ export default function MoviesPage() {
   }
 
   // Transform genres rows into grouped object
-  const genres = genresRows.reduce(
+  const genres = genresRows.reduce<Record<'movie' | 'tv' | 'music', { id: number; name: string }[]>>(
     (acc, g) => {
-      const t = g.type || "movie";
+      const t = (g.type as 'movie' | 'tv' | 'music') || 'movie';
       if (!acc[t]) acc[t] = [];
-      acc[t].push({ id: g.id, name: g.name });
+      acc[t].push({ id: Number(g.id), name: String(g.name) });
       return acc;
     },
     { movie: [], tv: [], music: [] }

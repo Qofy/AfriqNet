@@ -74,12 +74,32 @@ interface Notifications {
   [key: string]: boolean;
 }
 
+interface AccountState {
+  activeTab: 'profile' | 'security' | 'preferences' | 'notifications' | 'danger';
+  profileUrl: string | null;
+  formData: FormData;
+  passwordData: PasswordData;
+  showCurrentPassword: boolean;
+  showNewPassword: boolean;
+  showConfirmPassword: boolean;
+  deleteConfirm: string;
+  theme: string;
+  notifications: Notifications;
+  isLoading: boolean;
+  error: string | null;
+  successMessage: string | null;
+}
+
+interface RootState {
+  account: AccountState;
+}
+
 const getErrorMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message;
   return String(error);
 };
 
-const AccountClient: FC<AccountClientProps> = ({ user }): ReactNode => {
+const AccountClient: FC<AccountClientProps> = ({ user }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -98,7 +118,7 @@ const AccountClient: FC<AccountClientProps> = ({ user }): ReactNode => {
     isLoading,
     error,
     successMessage
-  } = useSelector((state) => state.account);
+  } = useSelector((state: RootState) => state.account);
 
   // Initialize user data on mount
   useEffect(() => {
@@ -222,7 +242,7 @@ const AccountClient: FC<AccountClientProps> = ({ user }): ReactNode => {
     }
   };
 
-  const renderTabContent = () => {
+  const renderTabContent = (): ReactNode => {
     switch (activeTab) {
       case 'profile':
         return (

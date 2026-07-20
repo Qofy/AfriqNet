@@ -4,27 +4,58 @@ import { useState } from "react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 
-const TABS_BY_TYPE = {
+type TabName = "overview" | "cast" | "episodes" | "related";
+
+const TABS_BY_TYPE: Record<string, TabName[]> = {
   music: ["overview", "related"],
   movie: ["overview", "cast", "episodes"],
   tv:    ["overview", "cast", "episodes"],
 };
 
-const TAB_LABELS = {
+const TAB_LABELS: Record<TabName, string> = {
   overview: "Overview",
   cast:     "Cast & Crew",
   episodes: "Episodes",
   related:  "Related Music",
 };
+interface DetailTabsProps {
+  movie: {
+    overview: string;
+    genre_ids?: number[];
+  };
+  episodes?: Array<{
+    id: string | number;
+    thumbnail: string;
+    title: string;
+    season: number;
+    episode: number;
+    duration: string;
+    description?: string;
+  }>;
+  cast?: Array<{
+    id: string | number;
+    image: string;
+    name: string;
+    role: string;
+  }>;
+  relatedMusic?: Array<{
+    id: string | number;
+    poster: string;
+    title: string;
+    artist: string;
+  }>;
+  contentType?: "movie" | "tv" | "music";
+}
+
 export default function DetailTabs({ 
   movie, 
   episodes = [],
-   cast = [],
-   relatedMusic=[],
-   contentType = "movie"  // "movie" | "tv" | "music"
-}) {
+  cast = [],
+  relatedMusic = [],
+  contentType = "movie"
+}: DetailTabsProps) {
   const tabs = TABS_BY_TYPE[contentType] ?? TABS_BY_TYPE.movie;
-  const [active, setActive] = useState(tabs[0]);
+  const [active, setActive] = useState<TabName>(tabs[0]);
 
   return (
     <div>

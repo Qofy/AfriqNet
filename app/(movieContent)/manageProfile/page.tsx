@@ -1,16 +1,16 @@
-// import { verifyAuth } from '@/lib/auth';
+import { verifyAuth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { getUserById } from '@/lib/db.server';
 import ManageProfileClient from '@/component/ManageProfile.client';
 
 export default async function ManageProfilePage() {
-  // const { session } = await verifyAuth();
+  const { session } = await verifyAuth();
   
-  // if (!session) {
-  //   redirect('/login');
-  // }
+  if (!session) {
+    redirect('/login');
+  }
 
-  const user = getUserById(session.userId);
+  const user = await getUserById(session.userId);
   
   if (!user) {
     redirect('/login');

@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 
-export default function HomeError({ error, reset }) {
+interface ErrorProps {
+  error: Error;
+  reset: () => void;
+}
+
+export default function HomeError({ error, reset }: ErrorProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-6">
       <div className="max-w-lg text-center">

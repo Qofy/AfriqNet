@@ -1,13 +1,33 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, FC } from "react";
 import { useSearchParams } from "next/navigation";
 import { Clapperboard, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
 import MoviesGrid from "@/component/MoviesGrid";
 import { useMovies } from "@/features/contentBrowserSlice";
 
-export default function MoviesClient({ initialMovies = [], genres = { movie: [] } }) {
+interface Movie {
+  id: string | number;
+  title?: string;
+  name?: string;
+  genre_ids?: number[];
+  [key: string]: unknown;
+}
+
+interface Genre {
+  id: number;
+  name: string;
+}
+
+interface MoviesClientProps {
+  initialMovies?: Movie[];
+  genres?: {
+    movie: Genre[];
+  };
+}
+
+const MoviesClient: FC<MoviesClientProps> = ({ initialMovies = [], genres = { movie: [] } }) => {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -23,7 +43,7 @@ export default function MoviesClient({ initialMovies = [], genres = { movie: [] 
   const { data: moviesData = [], isLoading, error } = useMovies(page);
   const movies = moviesData.length > 0 ? moviesData : initialMovies;
 
-  const filtered = movies.filter((movie) => {
+  const filtered = movies.filter((movie: Movie) => {
     const title = movie.title || movie.name || "";
     const matchesSearch = title.toLowerCase().includes(search.toLowerCase());
     const matchesGenre =
@@ -125,4 +145,6 @@ export default function MoviesClient({ initialMovies = [], genres = { movie: [] 
       </div>
     </div>
   );
-}
+};
+
+export default MoviesClient;

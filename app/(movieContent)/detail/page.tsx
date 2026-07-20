@@ -4,7 +4,7 @@ import { MovieHero } from "@/component/MovieHero";
 import DetailTabs from "@/component/DetailTabs";
 import { getAllMovies, getAllMusicVideos, getAllTVShows } from "../../../lib/db.server";
 
-export default async function DetailPage({ searchParams }) {
+export default async function DetailPage({ searchParams }: { searchParams: Promise<Record<string, string | string[]>> }) {
   const params = await searchParams;
   const movieId = params?.id;
   const sampleMovies = getAllMovies();

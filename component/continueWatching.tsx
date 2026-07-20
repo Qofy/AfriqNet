@@ -4,11 +4,28 @@ import { useState } from "react";
 import Image from "next/image";
 import { Play, ChevronLeft, ChevronRight, X } from "lucide-react";
 
-export default function ContinueWatching({ watchingList = [] }) {
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [hoveredId, setHoveredId] = useState(null);
+interface WatchingItem {
+  id: string | number;
+  title?: string;
+  backdrop?: string;
+  poster?: string;
+  progress?: number;
+  timeLeft?: string;
+  season?: number;
+  episode?: number;
+  episodeTitle?: string;
+  year?: number;
+}
 
-  const handleScroll = (direction) => {
+interface ContinueWatchingProps {
+  watchingList?: WatchingItem[];
+}
+
+export default function ContinueWatching({ watchingList = [] }: ContinueWatchingProps) {
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [hoveredId, setHoveredId] = useState<string | number | null>(null);
+
+  const handleScroll = (direction: "left" | "right"): void => {
     const container = document.getElementById("continue-watching-scroll");
     if (!container) return;
 
@@ -25,7 +42,7 @@ export default function ContinueWatching({ watchingList = [] }) {
     setScrollPosition(newPosition);
   };
 
-  const handleRemove = (id, e) => {
+  const handleRemove = (id: string | number, e: React.MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation();
     // You can implement actual removal logic here
     console.log("Remove item:", id);
@@ -87,7 +104,7 @@ export default function ContinueWatching({ watchingList = [] }) {
                 <div className="relative w-full h-44 rounded-lg overflow-hidden bg-linear-to-br from-[#38cff0] to-[#039aec]">
                   {item.backdrop || item.poster ? (
                     <Image
-                      src={item.backdrop || item.poster}
+                      src={item.backdrop || item.poster || ""}
                       alt={item.title || "Movie thumbnail"}
                       fill
                       className="object-cover object-center"
