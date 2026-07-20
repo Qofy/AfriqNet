@@ -1,18 +1,38 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, FC } from "react";
 import { useSearchParams } from "next/navigation";
-import { Clapperboard, SlidersHorizontal } from "lucide-react";
+// import Image from "next/image";
+// import Link from "next/link";
+import { Star, SlidersHorizontal } from "lucide-react";
 import SearchBar from "@/component/Search";
 import MoviesGrid from "@/component/MoviesGrid";
-import { useMusicVideos } from "@/features/contentBrowserSlice";
+import { useTvShows } from "@/features/contentBrowserSlice";
 
-export default function MusicVideosClient({ initialVideos = [], genres = { music: [] } }) {
+interface Show {
+  id: string | number;
+  name?: string;
+  genre_ids?: number[];
+  [key: string]: unknown;
+}
+
+interface Genre {
+  id: number;
+  name: string;
+}
+
+interface TVShowsClientProps {
+  initialShows?: Show[];
+  genres?: {
+    tv: Genre[];
+  };
+}
+
+const TVShowsClient: FC<TVShowsClientProps> = ({ initialShows = [], genres = { tv: [] } }) => {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  // Get initial genre from URL query parameter
   const initialGenre = useMemo(() => {
     const genreParam = searchParams.get("genre");
     return genreParam ? parseInt(genreParam) : null;
@@ -20,41 +40,32 @@ export default function MusicVideosClient({ initialVideos = [], genres = { music
 
   const [activeGenre, setActiveGenre] = useState(initialGenre);
 
-  const { data: videosData = [], isLoading, error } = useMusicVideos(page);
-  const videos = videosData.length > 0 ? videosData : initialVideos;
+  const { data: showsData = [], isLoading, error } = useTvShows(page);
+  const shows = showsData.length > 0 ? showsData : initialShows;
 
-  const filtered = videos.filter((video) => {
-    const title = video.title || "";
-    const artist = video.artist || "";
-    const matchesSearch =
-      title.toLowerCase().includes(search.toLowerCase()) ||
-      artist.toLowerCase().includes(search.toLowerCase());
-    const matchesGenre =
-      activeGenre === null || (video.genre_ids || []).includes(activeGenre);
+  const filtered = shows.filter((show: Show) => {
+    const matchesSearch = (show.name || "").toLowerCase().includes(search.toLowerCase());
+    const matchesGenre = activeGenre === null || (show.genre_ids || []).includes(activeGenre);
     return matchesSearch && matchesGenre;
   });
 
-  const musicGenres = genres.music || [];
+  const tvGenres = genres.tv || [];
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <div className="bg-var(--background) py-18 px-6">
         <div className="container mx-auto max-w-6xl">
-          <h1 className="text-4xl font-bold text-white mb-2">Music Videos</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">TV Shows</h1>
           <p className="text-[#a2cbf9]">
-            {isLoading ? "Loading..." : `${videos.length} videos available`}
+            {isLoading ? "Loading..." : `${shows.length} shows available`}
           </p>
           {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
 
-          {/* Search */}
-          <div className="mt-4">
-            <SearchBar value={search} onChange={(v) => setSearch(v)} />
-          </div>
+          <SearchBar value={search} onChange={(v) => setSearch(v)} />
         </div>
       </div>
 
       <div className="container mx-auto max-w-6xl px-6 py-8">
-        {/* Genre Filter */}
         <div className="flex items-center gap-3 mb-8 overflow-x-auto pb-2">
           <SlidersHorizontal size={18} className="text-[#a2cbf9] shrink-0" />
           <button
@@ -65,7 +76,7 @@ export default function MusicVideosClient({ initialVideos = [], genres = { music
           >
             All
           </button>
-          {musicGenres.map((g) => (
+          {tvGenres.map((g) => (
             <button
               key={g.id}
               onClick={() => setActiveGenre(activeGenre === g.id ? null : g.id)}
@@ -78,17 +89,15 @@ export default function MusicVideosClient({ initialVideos = [], genres = { music
           ))}
         </div>
 
-        {/* Results count */}
         <p className="text-[#a2cbf9] text-sm mb-6">
           {filtered.length} {filtered.length === 1 ? "result" : "results"}
-          {activeGenre && ` in ${musicGenres.find((g) => g.id === activeGenre)?.name}`}
+          {activeGenre && ` in ${tvGenres.find((g) => g.id === activeGenre)?.name}`}
           {search && ` for "${search}"`}
         </p>
 
-        {/* Grid */}
         {isLoading ? (
           <div className="text-center py-24">
-            <p className="text-[#a2cbf9] text-lg">Loading music videos...</p>
+            <p className="text-[#a2cbf9] text-lg">Loading shows...</p>
           </div>
         ) : filtered.length > 0 ? (
           <>
@@ -113,8 +122,8 @@ export default function MusicVideosClient({ initialVideos = [], genres = { music
           </>
         ) : (
           <div className="text-center py-24">
-            <Clapperboard size={48} className="text-[#fd536a]/50 mx-auto mb-4" />
-            <p className="text-[#a2cbf9] text-lg">No music videos found</p>
+            <Star size={48} className="text-[#fd536a]/50 mx-auto mb-4" />
+            <p className="text-[#a2cbf9] text-lg">No shows found</p>
             <button
               onClick={() => {
                 setSearch("");
@@ -129,4 +138,6 @@ export default function MusicVideosClient({ initialVideos = [], genres = { music
       </div>
     </div>
   );
-}
+};
+
+export default TVShowsClient;

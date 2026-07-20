@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { FC } from "react";
 
-export default function BackButton() {
-  
+const BackButton: FC = () => {
   const router = useRouter();
-debugger
+
   return (
     <button
       onClick={() => router.back()}
@@ -16,4 +16,6 @@ debugger
       <span>Back</span>
     </button>
   );
-}
+};
+
+export default BackButton;

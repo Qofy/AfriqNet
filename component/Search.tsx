@@ -1,15 +1,23 @@
 "use client"
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useState, FC, ChangeEvent } from "react";
 import { useSearchContent } from "@/features/contentBrowserSlice";
 
-export default function SearchBar({
+interface SearchBarProps {
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  enableGlobalSearch?: boolean;
+  contentType?: string;
+}
+
+const SearchBar: FC<SearchBarProps> = ({
   value,
   onChange,
   placeholder = "Search movies...",
   enableGlobalSearch = false,
   contentType = 'all'
-}) {
+}) => {
   // Support controlled usage (pass `value` + `onChange`) or uncontrolled local state
   const [local, setLocal] = useState("");
   const isControlled = value !== undefined;
@@ -21,7 +29,7 @@ export default function SearchBar({
     contentType
   );
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const v = e.target.value;
     if (isControlled) {
       if (typeof onChange === 'function') onChange(v);
@@ -64,4 +72,6 @@ export default function SearchBar({
       )}
     </div>
   );
-}
+};
+
+export default SearchBar;

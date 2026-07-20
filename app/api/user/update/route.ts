@@ -1,15 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { verifyAuth } from '@/lib/auth';
 import { getUserByEmail, updateUser } from '@/lib/db.server';
 
-export async function PATCH(request) {
+interface UpdateUserBody {
+  name?: string;
+  email?: string;
+}
+
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
   try {
     const { session } = await verifyAuth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body: UpdateUserBody = await request.json();
     const { name, email } = body;
 
     if (!name || !email) {

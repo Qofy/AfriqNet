@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { verifyAuth, lucia } from '@/lib/auth';
 import { deleteUser, deleteWatchProgressForUser } from '@/lib/db.server';
 import { cookies } from 'next/headers';
 
-export async function DELETE() {
+export async function DELETE(): Promise<NextResponse> {
   try {
     const { session } = await verifyAuth();
     if (!session) {

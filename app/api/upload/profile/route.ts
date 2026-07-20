@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { uploadImage } from '@/lib/claudinary';
 
 export const runtime = 'nodejs';
 
-export async function POST(request) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const formData = await request.formData();
     const file = formData.get('file');
@@ -16,7 +16,7 @@ export async function POST(request) {
 
     return NextResponse.json({ url });
   } catch (err) {
-    // throw new Error ('Upload error', err);
-    return NextResponse.json({ error: (err && err.message) || String(err) }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

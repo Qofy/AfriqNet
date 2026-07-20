@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 
-export default function MusicVivdoesError({ error, reset }) {
+export default function MusicVivdoesError({
+  error,
+  reset,
+}: {
+  error?: Error;
+  reset?: () => void;
+}) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-6">
       <div className="max-w-lg text-center">

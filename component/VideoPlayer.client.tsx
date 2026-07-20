@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useCallback, useMemo, FC } from "react";
 import { Play, Pause } from "lucide-react";
 import {
 setPlaying, setShowOverlay,setCurrentTime,setDuration,setLastSaved,setResumeNotice,
@@ -8,12 +8,19 @@ setLoading,setError
 } from '@/features/videoPlayerSlice'
 import { useDispatch, useSelector } from "react-redux";
 
-export default function VideoPlayer({ src, autoplay = false, className = "w-full h-auto", contentId = null }) {
+interface VideoPlayerProps {
+  src: string;
+  autoplay?: boolean;
+  className?: string;
+  contentId?: string | null;
+}
+
+const VideoPlayer: FC<VideoPlayerProps> = ({ src, autoplay = false, className = "w-full h-auto", contentId = null }) => {
 
   const dispatch = useDispatch();
-  const videoRef = useRef(null);
-  const containerRef = useRef(null);
-  const progressIntervalRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const {
     playing,showOverlay,currentTime,duration,lastSaved, resumeNotice,
@@ -319,4 +326,6 @@ function togglePlay(e){
       </div>
     </div>
   );
-}
+};
+
+export default VideoPlayer;

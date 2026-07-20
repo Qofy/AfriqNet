@@ -1,14 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { verifyAuth } from '@/lib/auth';
 import { getUserByEmail, updateUser } from '@/lib/db.server';
 
-export async function PATCH(req) {
+interface ProfileBody {
+  profileUrl?: string;
+  name?: string;
+  email?: string;
+}
+
+interface Updates {
+  name?: string;
+  email?: string;
+  profile_image?: string;
+}
+
+export async function PATCH(req: NextRequest): Promise<NextResponse> {
   const auth = await verifyAuth();
   if (!auth?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let body;
+  let body: ProfileBody;
   try {
     body = await req.json();
   } catch (err) {
@@ -36,7 +48,7 @@ export async function PATCH(req) {
     }
 
     // Build updates object
-    const updates = {};
+    const updates: Updates = {};
     if (name !== undefined) updates.name = name;
     if (email !== undefined) updates.email = email;
     if (profileUrl !== undefined) updates.profile_image = profileUrl;

@@ -1,8 +1,16 @@
 import fs from 'fs';
 import path from 'path';
+import { type NextRequest } from 'next/server';
 import { getMovieById, getMusicVideoById } from '@/lib/db.server';
 
-export async function GET(req, { params }) {
+interface StreamParams {
+  id: string;
+}
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<StreamParams> }
+): Promise<Response> {
   try {
     // In Next App Router dynamic API handlers `params` is a Promise — unwrap it first
     const resolved = await params;

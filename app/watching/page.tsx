@@ -4,7 +4,24 @@ import { redirect } from 'next/navigation';
 import VideoPlayer from '../../component/VideoPlayer.client';
 import BackButton from '../../component/BackButton';
 
-export default async function WatchingPage({ searchParams }) {
+interface SearchParams {
+  id?: string;
+  type?: string;
+  autoplay?: string;
+}
+
+interface Content {
+  id: string;
+  title?: string;
+  name?: string;
+  [key: string]: unknown;
+}
+
+export default async function WatchingPage({
+  searchParams
+}: {
+  searchParams: Promise<SearchParams>
+}) {
   const params = await searchParams;
   const movieId = params?.id;
   const type = params?.type; // 'movie' or 'music_video'
@@ -19,20 +36,20 @@ export default async function WatchingPage({ searchParams }) {
   }
 
   // Try to get content - first try as movie, then as music video if not found
-  let content = getMovieById(movieId);
+  let content: Content | null = getMovieById(movieId) as Content | null;
   let contentType = 'movie';
-  
+
   if (!content) {
-    content = getMusicVideoById(movieId);
+    content = getMusicVideoById(movieId) as Content | null;
     contentType = 'music_video';
   }
-  
+
   // If type parameter is provided, use it to determine which function to call
   if (type === 'music_video') {
-    content = getMusicVideoById(movieId);
+    content = getMusicVideoById(movieId) as Content | null;
     contentType = 'music_video';
   } else if (type === 'movie') {
-    content = getMovieById(movieId);
+    content = getMovieById(movieId) as Content | null;
     contentType = 'movie';
   }
 

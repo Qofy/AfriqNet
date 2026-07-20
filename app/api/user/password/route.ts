@@ -1,16 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { verifyAuth } from '@/lib/auth';
 import { getUserById, updateUserPassword } from '@/lib/db.server';
 import { hash, verify } from '@node-rs/argon2';
 
-export async function PATCH(request) {
+interface PasswordBody {
+  currentPassword?: string;
+  newPassword?: string;
+}
+
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
   try {
     const { session } = await verifyAuth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body: PasswordBody = await request.json();
     const { currentPassword, newPassword } = body;
 
     if (!currentPassword || !newPassword) {
