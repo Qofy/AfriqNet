@@ -5,7 +5,7 @@ export const metadata = {
   description: "Register or login and enjoy free movies from Africa",
 };
 
-export default function AuthLayout({ children }) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}

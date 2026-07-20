@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, FC, ReactNode, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { 
-  User, 
-  Lock, 
-  Camera, 
-  Save, 
-  Eye, 
-  EyeOff, 
+import {
+  User,
+  Lock,
+  Camera,
+  Save,
+  Eye,
+  EyeOff,
   Trash2,
   Shield,
   Bell,
@@ -42,10 +42,47 @@ import {
   deleteAccount
 } from '../features/accountSlice';
 
-export default function AccountClient({ user }) {
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  profileUrl?: string;
+}
+
+interface AccountClientProps {
+  user: User;
+}
+
+interface Tab {
+  id: 'profile' | 'security' | 'preferences' | 'notifications' | 'danger';
+  label: string;
+  icon: FC<{ size: number; className?: string }>;
+}
+
+interface FormData {
+  name: string;
+  email: string;
+}
+
+interface PasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+interface Notifications {
+  [key: string]: boolean;
+}
+
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  return String(error);
+};
+
+const AccountClient: FC<AccountClientProps> = ({ user }): ReactNode => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const {
     activeTab,
@@ -97,7 +134,7 @@ export default function AccountClient({ user }) {
     { id: 'danger', label: 'Danger Zone', icon: AlertTriangle }
   ];
 
-  const handleProfileImageUpload = async (e) => {
+  const handleProfileImageUpload = async (e: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -109,7 +146,7 @@ export default function AccountClient({ user }) {
       dispatch(setProfileUrl(url));
       dispatch(setSuccessMessage('Profile image uploaded successfully!'));
     } catch (error) {
-      dispatch(setError(error.message));
+      dispatch(setError(getErrorMessage(error)));
     } finally {
       dispatch(setLoading(false));
       if (fileInputRef.current) {
@@ -118,7 +155,7 @@ export default function AccountClient({ user }) {
     }
   };
 
-  const handleProfileUpdate = async (e) => {
+  const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     
     dispatch(setLoading(true));
@@ -129,13 +166,13 @@ export default function AccountClient({ user }) {
       dispatch(setFormData(formData));
       dispatch(setSuccessMessage('Profile updated successfully!'));
     } catch (error) {
-      dispatch(setError(error.message));
+      dispatch(setError(getErrorMessage(error)));
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-  const handlePasswordChange = async (e) => {
+  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -156,13 +193,13 @@ export default function AccountClient({ user }) {
       dispatch(setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' }));
       dispatch(setSuccessMessage('Password changed successfully!'));
     } catch (error) {
-      dispatch(setError(error.message));
+      dispatch(setError(getErrorMessage(error)));
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = async (): Promise<void> => {
     if (deleteConfirm !== 'DELETE') {
       dispatch(setError('Please type DELETE to confirm account deletion'));
       return;
@@ -179,7 +216,7 @@ export default function AccountClient({ user }) {
       await deleteAccount();
       dispatch(setSuccessMessage('Account deleted successfully'));
     } catch (error) {
-      dispatch(setError(error.message));
+      dispatch(setError(getErrorMessage(error)));
     } finally {
       dispatch(setLoading(false));
     }
@@ -511,4 +548,6 @@ export default function AccountClient({ user }) {
       </div>
     </div>
   );
-}
+};
+
+export default AccountClient;

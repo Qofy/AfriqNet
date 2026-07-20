@@ -1,6 +1,3 @@
-// import { verifyAuth } from '@/lib/auth';
-import { redirect } from 'next/navigation';
-import { getUserById } from '@/lib/db.server';
 import AccountClient from '@/component/AccountClient';
 
 export const metadata = {
@@ -9,18 +6,12 @@ export const metadata = {
 };
 
 export default async function AccountPage() {
-  // const { session, user } = await verifyAuth();
-  
-  // if (!session || !user) {
-  //   redirect('/login');
-  // }
-
-  // Get fresh user data from database
-  const userData = getUserById(user.id);
-  
-  if (!userData) {
-    redirect('/login');
-  }
+  // Placeholder user data
+  const userData = {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">

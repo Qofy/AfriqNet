@@ -1,93 +1,110 @@
-// "use server";
+"use server";
 
-// import { redirect } from "next/navigation";
-// import { hashUserPassword, verifyPassword } from "../lib/hashpassword";
-// import { createUsers } from "../lib/users";
-// import getUserByEmailWrapper from "../lib/users";
-// import destorySession, { createAuthSession } from "../lib/auth";
+import { redirect } from "next/navigation";
+import { hashUserPassword, verifyPassword } from "../lib/hashpassword";
+import { createUsers } from "../lib/users";
+import getUserByEmailWrapper from "../lib/users";
+import destorySession, { createAuthSession } from "../lib/auth";
 
-// export async function signup(prevState, formData) {
-//     const users_name = formData.get("name");
-//     const email = formData.get("email");
-//     const password = formData.get("password");
-//     const confirm_password = formData.get("confirmPassword");
+export async function signup(prevState, formData) {
+    const users_name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const confirm_password = formData.get("confirmPassword");
 
-//     let errors = {};
+    let errors = {};
+
+    // Name validation
+    if (!users_name.trim()) {
+        errors.name = "Name is required";
+    } else if (users_name.trim().length < 2) {
+        errors.name = "Name must be at least 2 characters";
+    }
+
+    // Check if user already exists
+    const existingUser = await getUserByEmailWrapper(email);
+    if (existingUser) {
+        errors.email = "It seems there is an account already created with this email!";
+    }
+
+    if (!email.includes("@")) {
+        errors.email = "Invalid email, please make sure you use the '@' sign!";
+    } else if (!email.trim()) {
+        errors.email = "Email is required";
+    }
     
-//     // Check if user already exists
-//     const existingUser = await getUserByEmailWrapper(email);
-//     if (existingUser) {
-//         errors.email = "It seems there is an account already created with this email!";
-//     }
+    if (password.trim().length < 8) {
+        errors.password = "Your password should be up to 8 characters";
+    } else if (!password) {
+        errors.password = "Password is required";
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+        errors.password = "Password must contain uppercase, lowercase, and number";
+    }
+
+    if (password.trim() !== confirm_password.trim()) {
+        errors.confirm_password = "Your password doesn't match";
+    } else if (!confirm_password) {
+        errors.confirm_password = "Please confirm your password";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        return {
+            errors: {
+                name: errors.name || "",
+                email: errors.email || "",
+                password: errors.password || "",
+                confirm_password: errors.confirm_password || "",
+                general: errors.general || ""
+            },
+        };
+    }
+
+    const hashPassword = await hashUserPassword(password);
+
+    try {
+        const user = await createUsers(users_name, email, hashPassword);
+        await createAuthSession(user.id);
+    } catch (error) {
+        console.error("Signup error:", error);
+        return {
+            errors: {
+                name: "",
+                email: "",
+                password: "",
+                confirm_password: "",
+                general: "Something went wrong. Please try again."
+            }
+        };
+    }
     
-//     if (!email.includes("@")) {
-//         errors.email = "Invalid email, please make sure you use the '@' sign!";
-//     } else if (!email.trim()) {
-//         errors.email = "Email is required";
-//     }
-    
-//     if (password.trim().length < 8) {
-//         errors.password = "Your password should be up to 8 characters";
-//     } else if (!password) {
-//         errors.password = "Password is required";
-//     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-//         errors.password = "Password must contain uppercase, lowercase, and number";
-//     }
+    redirect("/home");
+}
 
-//     if (password.trim() !== confirm_password.trim()) {
-//         errors.confirm_password = "Your password doesn't match";
-//     } else if (!confirm_password) {
-//         errors.confirm_password = "Please confirm your password";
-//     }
+export async function signin(prevState, formData) {
+    const email = formData.get("email");
+    const password = formData.get("password");
 
-//     if (Object.keys(errors).length > 0) {
-//         return {
-//             errors,
-//         };
-//     }
+    const loginExsistingUser = await getUserByEmailWrapper(email);
+    if (!loginExsistingUser) {
+        return{
+            errors:{
+                email:"Could not authenticate, please check your e-mail "
+            }
+        }
+    }
+    const isValidPassword = await verifyPassword(loginExsistingUser.password, password);
+    if (!isValidPassword) {
+        return {
+            errors:{
+                email:"Could not authenticate, please check your password "
+            }
+        }
+    }
+    await createAuthSession(loginExsistingUser.id);
+    redirect("/home")
+}
 
-//     const hashPassword = await hashUserPassword(password);
-
-//     try {
-//         const user = await createUsers(users_name, email, hashPassword);
-//         await createAuthSession(user.id);
-//     } catch (error) {
-//         console.error("Signup error:", error);
-//         return {
-//             errors: {
-//                 general: "Something went wrong. Please try again."
-//             }
-//         };
-//     }
-    
-//     redirect("/home");
-// }
-
-// export async function signin(prevState, formData) {
-//     const email = formData.get("email");
-//     const password = formData.get("password");
-
-//     const loginExsistingUser = await getUserByEmailWrapper(email);
-//     if (!loginExsistingUser) {
-//         return{
-//             errors:{
-//                 email:"Could not authenticate, please check your e-mail "
-//             }
-//         }
-//     }
-//     const isValidPassword = await verifyPassword(loginExsistingUser.password, password);
-//     if (!isValidPassword) {
-//         return {
-//             errors:{
-//                 email:"Could not authenticate, please check your password "
-//             }
-//         }
-//     }
-//     await createAuthSession(loginExsistingUser.id);
-//     redirect("/home")
-// }
-
-// export async function logout() {
-//   await destorySession();
-//   redirect("/login")
-// }
+export async function logout() {
+  await destorySession();
+  redirect("/login")
+}

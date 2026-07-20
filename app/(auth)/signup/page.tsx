@@ -7,7 +7,7 @@ import { signup } from "../../../actions/auth-action";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 export default function SignUpPage() {
-  const [formState, formAction] = useActionState(signup, {});
+  const [formState, formAction] = useActionState(signup, { errors: { name: "", email: "", password: "", confirm_password: "", general: "" } });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   // const [errors, setErrors] = useState({});
@@ -198,11 +198,9 @@ export default function SignUpPage() {
                 <p className="text-red-500 text-sm mt-1">{formState.errors.confirm_password}</p>
               )}
             </div>
-              {formState.errors && (<ul id="form-error">
-                {Object.keys(formState.errors).map((error)=>(<li key={error}>
-                  {formState.errors[error]}
-                </li>))}
-              </ul>)}
+              {formState.errors?.general && (
+                <p className="text-red-500 text-sm mt-4 p-3 bg-red-500/10 rounded-lg">{formState.errors.general}</p>
+              )}
             {/* Submit Button */}
             <button
               type="submit"
