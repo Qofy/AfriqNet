@@ -6,13 +6,33 @@ import { createUsers } from "../lib/users";
 import getUserByEmailWrapper from "../lib/users";
 import destorySession, { createAuthSession } from "../lib/auth";
 
-export async function signup(prevState, formData) {
-    const users_name = formData.get("name");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const confirm_password = formData.get("confirmPassword");
+interface ErrorState {
+    name: string;
+    email: string;
+    password: string;
+    confirm_password: string;
+    general?: string;
+}
 
-    let errors = {};
+interface SignupResponse {
+    errors: ErrorState;
+}
+
+interface SigninErrorState {
+    email?: string;
+}
+
+interface SigninResponse {
+    errors: SigninErrorState;
+}
+
+export async function signup(prevState: unknown, formData: FormData): Promise<SignupResponse | undefined> {
+    const users_name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirm_password = formData.get("confirmPassword") as string;
+
+    const errors: Partial<ErrorState> = {};
 
     // Name validation
     if (!users_name.trim()) {
@@ -65,6 +85,7 @@ export async function signup(prevState, formData) {
         const user = await createUsers(users_name, email, hashPassword);
         await createAuthSession(user.id);
     } catch (error) {
+        const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
         console.error("Signup error:", error);
         return {
             errors: {
@@ -72,7 +93,7 @@ export async function signup(prevState, formData) {
                 email: "",
                 password: "",
                 confirm_password: "",
-                general: "Something went wrong. Please try again."
+                general: message
             }
         };
     }
@@ -80,31 +101,31 @@ export async function signup(prevState, formData) {
     redirect("/home");
 }
 
-export async function signin(prevState, formData) {
-    const email = formData.get("email");
-    const password = formData.get("password");
+export async function signin(prevState: unknown, formData: FormData): Promise<SigninResponse | undefined> {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     const loginExsistingUser = await getUserByEmailWrapper(email);
     if (!loginExsistingUser) {
-        return{
-            errors:{
-                email:"Could not authenticate, please check your e-mail "
+        return {
+            errors: {
+                email: "Could not authenticate, please check your e-mail"
             }
-        }
+        };
     }
     const isValidPassword = await verifyPassword(loginExsistingUser.password, password);
     if (!isValidPassword) {
         return {
-            errors:{
-                email:"Could not authenticate, please check your password "
+            errors: {
+                email: "Could not authenticate, please check your password"
             }
-        }
+        };
     }
     await createAuthSession(loginExsistingUser.id);
-    redirect("/home")
+    redirect("/home");
 }
 
-export async function logout() {
+export async function logout(): Promise<never> {
   await destorySession();
-  redirect("/login")
+  redirect("/login");
 }
