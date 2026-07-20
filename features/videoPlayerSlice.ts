@@ -1,81 +1,95 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
 
-const initialState ={
-    playing:false,
-    showOverlay:true,
+interface VideoPlayerState {
+  playing: boolean;
+  showOverlay: boolean;
+  currentTime: number;
+  duration: number;
+  lastSaved: number | null;
+  resumeNotice: string | null;
+  isFullscreen: boolean;
+  errorMessage: string | null;
+  nowTick: number;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: VideoPlayerState = {
+    playing: false,
+    showOverlay: true,
     currentTime: 0,
-    duration:0,
-    lastSaved:null,
-    resumeNotice:null,
-    isFullscreen:false,
-    errorMessage:null,
-    nowTick:0,
-    isLoading:false,
-    error:null
+    duration: 0,
+    lastSaved: null,
+    resumeNotice: null,
+    isFullscreen: false,
+    errorMessage: null,
+    nowTick: 0,
+    isLoading: false,
+    error: null
 }
 
 const videoPlayerSlice = createSlice({
     name:"videoplayer",
     initialState, 
-    reducers:{
-        setPlaying(state, action){
-            state.playing=action.payload;
-            state.showOverlay= !action.payload;
-            if(action.payload){
+    reducers: {
+        setPlaying(state, action: PayloadAction<boolean>) {
+            state.playing = action.payload;
+            state.showOverlay = !action.payload;
+            if(action.payload) {
                 state.errorMessage = null;
             }
         },
-        setShowOverlay(state,action){
-            state.showOverlay=action.payload;
+        setShowOverlay(state, action: PayloadAction<boolean>) {
+            state.showOverlay = action.payload;
         },
-        setCurrentTime(state, action){
-            state.currentTime=action.payload;
+        setCurrentTime(state, action: PayloadAction<number>) {
+            state.currentTime = action.payload;
         },
-        setDuration(state,action){
-            state.duration=action.payload;
+        setDuration(state, action: PayloadAction<number>) {
+            state.duration = action.payload;
         },
-        setLastSaved(state,action){
-            state.lastSaved=action.payload;
+        setLastSaved(state, action: PayloadAction<number | null>) {
+            state.lastSaved = action.payload;
         },
-        setResumeNotice(state,action){
-            state.resumeNotice=action.payload;
+        setResumeNotice(state, action: PayloadAction<string | null>) {
+            state.resumeNotice = action.payload;
         },
-        clearResumeNotice(state){
-            state.resumeNotice =null;
+        clearResumeNotice(state) {
+            state.resumeNotice = null;
         },
-        setIsFullscreen(state,action){
-            state.isFullscreen=action.payload
+        setIsFullscreen(state, action: PayloadAction<boolean>) {
+            state.isFullscreen = action.payload;
         },
-        setErrorMessage(state,action){
+        setErrorMessage(state, action: PayloadAction<string | null>) {
             state.errorMessage = action.payload;
-            state.playing=false;
-            state.showOverlay=true
+            state.playing = false;
+            state.showOverlay = true;
         },
-        clearErrorMessage(state){
-            state.errorMessage=null;
+        clearErrorMessage(state) {
+            state.errorMessage = null;
         },
-        setNowTick(state,action){
-            state.nowTick=action.payload;
+        setNowTick(state, action: PayloadAction<number>) {
+            state.nowTick = action.payload;
         },
-        setLoading(state,action){
-            state.isLoading=action.payload;
+        setLoading(state, action: PayloadAction<boolean>) {
+            state.isLoading = action.payload;
         },
-        setError(state,action){
-            state.error=action.payload;
+        setError(state, action: PayloadAction<string | null>) {
+            state.error = action.payload;
         },
-        clearError(state){
-            state.error=null;
+        clearError(state) {
+            state.error = null;
         },
-        resetPlayer(state){
-            state.playing=false;
-            state.showOverlay=true;
-            state.currentTime=0;
-            state.duration=0;
-            state.resumeNotice=null;
-            state.errorMessage=null;
+        resetPlayer(state) {
+            state.playing = false;
+            state.showOverlay = true;
+            state.currentTime = 0;
+            state.duration = 0;
+            state.resumeNotice = null;
+            state.errorMessage = null;
         }
     }
 })

@@ -2,15 +2,32 @@ import { Lucia } from "lucia";
 import { getFirestoreDb } from "./firebase.server";
 import { cookies } from "next/headers";
 
+interface SessionData {
+  id: string;
+  userId: string;
+  expiresAt: Date;
+  fresh: boolean;
+}
+
+interface UserData {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface SessionAndUserResult {
+  session: SessionData | null;
+  user: UserData | null;
+}
+
 const adapter = {
-  async getSessionAndUser(sessionId) {
+  async getSessionAndUser(sessionId: string): Promise<[SessionData | null, UserData | null]> {
     const db = getFirestoreDb();
     const sessionDoc = await db.collection("sessions").doc(sessionId).get();
     if (!sessionDoc.exists) return [null, null];
-    const sessionData = sessionDoc.data();
+    const sessionData = sessionDoc.data() as any;
     const userDoc = await db.collection("users").doc(sessionData.user_id).get();
     if (!userDoc.exists) return [null, null];
-    const userData = userDoc.data();
+    const userData = userDoc.data() as UserData;
     return [
       {
         id: sessionDoc.id,
@@ -21,10 +38,10 @@ const adapter = {
       {
         id: userData?.id || userDoc.id,
         ...userData
-      }
+      } as UserData
     ];
   },
-  async getUserSessions(userId) {
+  async getUserSessions(userId: string): Promise<SessionData[]> {
     const db = getFirestoreDb();
     const snap = await db.collection("sessions").where("user_id", "==", userId).get();
     return snap.docs.map(doc => ({
@@ -34,20 +51,20 @@ const adapter = {
       fresh: false
     }));
   },
-  async setSession(session) {
+  async setSession(session: SessionData): Promise<void> {
     const db = getFirestoreDb();
     await db.collection("sessions").doc(session.id).set({
       user_id: session.userId,
       expires_at: session.expiresAt.getTime()
     });
   },
-  async updateSessionExpiration(sessionId, expiresAt) {
+  async updateSessionExpiration(sessionId: string, expiresAt: Date): Promise<void> {
     const db = getFirestoreDb();
     await db.collection("sessions").doc(sessionId).update({
       expires_at: expiresAt.getTime()
     });
   },
-  async deleteSession(sessionId) {
+  async deleteSession(sessionId: string): Promise<void> {
     const db = getFirestoreDb();
     await db.collection("sessions").doc(sessionId).delete();
   },

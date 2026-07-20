@@ -1,8 +1,41 @@
 
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+interface FormData {
+  name: string;
+  email: string;
+}
 
-const initialState = {
+interface PasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+interface Notifications {
+  [key: string]: boolean;
+  email: boolean;
+  push: boolean;
+  marketing: boolean;
+}
+
+interface AccountState {
+  activeTab: string;
+  profileUrl: string | null;
+  formData: FormData;
+  passwordData: PasswordData;
+  showCurrentPassword: boolean;
+  showNewPassword: boolean;
+  showConfirmPassword: boolean;
+  deleteConfirm: string;
+  theme: string;
+  notifications: Notifications;
+  isLoading: boolean;
+  error: string | null;
+  successMessage: string | null;
+}
+
+const initialState: AccountState = {
     activeTab: 'profile',
     profileUrl: null,
     formData: {
@@ -33,29 +66,31 @@ const accountSlice = createSlice({
   name: 'account',
   initialState,
   reducers: {
-    setActiveTab: (state, action) => {
+    setActiveTab: (state, action: PayloadAction<string>) => {
       state.activeTab = action.payload;
     },
-    setProfileUrl: (state, action) => {
+    setProfileUrl: (state, action: PayloadAction<string | null>) => {
       state.profileUrl = action.payload;
     },
-    setFormData: (state, action) => {
+    setFormData: (state, action: PayloadAction<Partial<FormData>>) => {
       state.formData = { ...state.formData, ...action.payload };
     },
-    setPasswordData: (state, action) => {
+    setPasswordData: (state, action: PayloadAction<Partial<PasswordData>>) => {
       state.passwordData = { ...state.passwordData, ...action.payload };
     },
-    togglePasswordVisibility: (state, action) => {
-      const field = action.payload;
-      state[field] = !state[field];
+    togglePasswordVisibility: (state, action: PayloadAction<string>) => {
+      const field = action.payload as keyof AccountState;
+      if (typeof state[field] === 'boolean') {
+        state[field] = !state[field];
+      }
     },
-    setDeleteConfirm: (state, action) => {
+    setDeleteConfirm: (state, action: PayloadAction<string>) => {
       state.deleteConfirm = action.payload;
     },
-    setTheme: (state, action) => {
+    setTheme: (state, action: PayloadAction<string>) => {
       state.theme = action.payload;
     },
-    toggleNotification: (state, action) => {
+    toggleNotification: (state, action: PayloadAction<string>) => {
       const key = action.payload;
       state.notifications[key] = !state.notifications[key];
     },
@@ -72,18 +107,18 @@ const accountSlice = createSlice({
     clearSuccessMessage: (state) => {
       state.successMessage = null;
     },
-    initializeUserData: (state, action) => {
+    initializeUserData: (state, action: PayloadAction<{ profileImage?: string | null; name?: string; email?: string }>) => {
       state.profileUrl = action.payload.profileImage || null;
       state.formData.name = action.payload.name || '';
       state.formData.email = action.payload.email || '';
     },
-    setLoading: (state, action) => {
+    setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
-    setError: (state, action) => {
+    setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setSuccessMessage: (state, action) => {
+    setSuccessMessage: (state, action: PayloadAction<string | null>) => {
       state.successMessage = action.payload;
     }
   }

@@ -1,7 +1,57 @@
 import { getFirestoreDb } from './firebase.server';
 
+interface Movie {
+  id: string;
+  title: string;
+  type: string;
+  poster: string;
+  backdrop: string;
+  rating: number;
+  release_date: string;
+  overview: string;
+  genre_ids: number[];
+  runtime: number;
+  tagline: string;
+  video_stram: string;
+  trailer: string;
+  [key: string]: unknown;
+}
 
-const staticMovies = [
+interface TVShow {
+  id: string;
+  name: string;
+  type: string;
+  poster: string;
+  backdrop: string;
+  rating: number;
+  release_date: string;
+  overview: string;
+  genre_ids: number[];
+  [key: string]: unknown;
+}
+
+interface MusicVideo {
+  id: string;
+  title: string;
+  type: string;
+  artist: string;
+  poster: string;
+  backdrop: string;
+  rating: number;
+  release_date: string;
+  overview: string;
+  genre_ids: number[];
+  stream: string | null;
+  [key: string]: unknown;
+}
+
+interface Genre {
+  id: number;
+  name: string;
+  type: string;
+}
+
+const staticMovies: Movie[] = [
   {
     id: 'm1',
     title: 'All The Devils Are There',
@@ -113,7 +163,7 @@ const staticMovies = [
   }
 ];
 
-const staticTVShows = [
+const staticTVShows: TVShow[] = [
   {
     id: 'tv1',
     name: 'Nebula Station',
@@ -318,7 +368,7 @@ const staticTVShows = [
   }
 ];
 
-const staticMusicVideos = [
+const staticMusicVideos: MusicVideo[] = [
   {
     id: 'mv1',
     title: 'Oil On My Head',
@@ -481,7 +531,7 @@ const staticMusicVideos = [
   }
 ];
 
-const staticGenres = [
+const staticGenres: [number, string, string][] = [
   [28, 'Action', 'movie'],
   [12, 'Adventure', 'movie'],
   [16, 'Animation', 'movie'],
@@ -511,7 +561,7 @@ const staticGenres = [
   [10, 'Soul', 'music']
 ];
 
-export function getAllMovies() {
+export function getAllMovies(): Array<Movie & { videoStream: string | null }> {
   return staticMovies.map(movie => ({
     ...movie,
     genre_ids: movie.genre_ids || [],
@@ -520,14 +570,14 @@ export function getAllMovies() {
   }));
 }
 
-export function getAllTVShows() {
+export function getAllTVShows(): TVShow[] {
   return staticTVShows.map(show => ({
     ...show,
     genre_ids: show.genre_ids || []
   }));
 }
 
-export function getAllMusicVideos() {
+export function getAllMusicVideos(): MusicVideo[] {
   return staticMusicVideos.map(video => ({
     ...video,
     genre_ids: video.genre_ids || [],
@@ -535,7 +585,7 @@ export function getAllMusicVideos() {
   }));
 }
 
-export function getMovieById(id) {
+export function getMovieById(id: string): (Movie & { videoStream: string | null }) | null {
   const movie = staticMovies.find(m => m.id === id);
   if (movie) {
     return {
@@ -548,7 +598,7 @@ export function getMovieById(id) {
   return null;
 }
 
-export function getTVShowById(id) {
+export function getTVShowById(id: string): TVShow | null {
   const show = staticTVShows.find(s => s.id === id);
   if (show) {
     return {
@@ -559,7 +609,7 @@ export function getTVShowById(id) {
   return null;
 }
 
-export function getMusicVideoById(id) {
+export function getMusicVideoById(id: string): MusicVideo | null {
   const video = staticMusicVideos.find(m => m.id === id);
   if (video) {
     return {
@@ -571,18 +621,18 @@ export function getMusicVideoById(id) {
   return null;
 }
 
-export function getGenresByType(type) {
+export function getGenresByType(type: string): Array<{ id: number; name: string }> {
   return staticGenres
     .filter(g => g[2] === type)
     .map(g => ({ id: g[0], name: g[1] }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function getAllGenres() {
+export function getAllGenres(): Genre[] {
   return staticGenres.map(g => ({ id: g[0], name: g[1], type: g[2] }));
 }
 
-export function searchContent(query, contentType = null) {
+export function searchContent(query: string, contentType: string | null = null): unknown[] {
   const searchTerm = query.toLowerCase();
   const results = [];
 

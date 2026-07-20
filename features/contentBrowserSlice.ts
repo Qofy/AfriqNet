@@ -1,24 +1,45 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery, useQueryClient } from 'react-query';
 import axios from 'axios';
 
-const fetchMovies = async (page = 1) => {
+interface Content {
+  [key: string]: unknown;
+}
+
+interface PageInfo {
+  movies: number;
+  tvShows: number;
+  musicVideos: number;
+}
+
+interface ContentBrowserState {
+  movies: Content[];
+  tvShows: Content[];
+  musicVideos: Content[];
+  searchResults: Content[];
+  currentPage: PageInfo;
+  searchQuery: string;
+  searchContentType: string;
+  error: string | null;
+}
+
+const fetchMovies = async (page = 1): Promise<Content[]> => {
   const { data } = await axios.get('/api/movies', { params: { page } });
   return data.data;
 };
 
-const fetchTvShows = async (page = 1) => {
+const fetchTvShows = async (page = 1): Promise<Content[]> => {
   const { data } = await axios.get('/api/tv-shows', { params: { page } });
   return data.data;
 };
 
-const fetchMusicVideos = async (page = 1) => {
+const fetchMusicVideos = async (page = 1): Promise<Content[]> => {
   const { data } = await axios.get('/api/music-videos', { params: { page } });
   return data.data;
 };
 
-const searchContent = async (query, contentType = 'all') => {
+const searchContent = async (query: string, contentType = 'all'): Promise<Content[]> => {
   const { data } = await axios.get('/api/search', {
     params: { query, contentType },
   });
@@ -40,44 +61,44 @@ const contentBrowserSlice = createSlice({
     searchQuery: '',
     searchContentType: 'all',
     error: null,
-  },
+  } as ContentBrowserState,
   reducers: {
-    setMovies: (state, action) => {
+    setMovies: (state, action: PayloadAction<Content[]>) => {
       state.movies = action.payload;
       state.error = null;
     },
-    setTvShows: (state, action) => {
+    setTvShows: (state, action: PayloadAction<Content[]>) => {
       state.tvShows = action.payload;
       state.error = null;
     },
-    setMusicVideos: (state, action) => {
+    setMusicVideos: (state, action: PayloadAction<Content[]>) => {
       state.musicVideos = action.payload;
       state.error = null;
     },
-    setSearchResults: (state, action) => {
+    setSearchResults: (state, action: PayloadAction<Content[]>) => {
       state.searchResults = action.payload;
       state.error = null;
     },
-    setCurrentPage: (state, action) => {
+    setCurrentPage: (state, action: PayloadAction<{ contentType: keyof PageInfo; page: number }>) => {
       const { contentType, page } = action.payload;
       state.currentPage[contentType] = page;
     },
-    setSearchQuery: (state, action) => {
+    setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     },
-    setSearchContentType: (state, action) => {
+    setSearchContentType: (state, action: PayloadAction<string>) => {
       state.searchContentType = action.payload;
     },
-    appendMovies: (state, action) => {
+    appendMovies: (state, action: PayloadAction<Content[]>) => {
       state.movies = [...state.movies, ...action.payload];
     },
-    appendTvShows: (state, action) => {
+    appendTvShows: (state, action: PayloadAction<Content[]>) => {
       state.tvShows = [...state.tvShows, ...action.payload];
     },
-    appendMusicVideos: (state, action) => {
+    appendMusicVideos: (state, action: PayloadAction<Content[]>) => {
       state.musicVideos = [...state.musicVideos, ...action.payload];
     },
-    setError: (state, action) => {
+    setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
     clearError: (state) => {

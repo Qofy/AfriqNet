@@ -1,24 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'axios';
 
+interface WatchlistItem {
+  contentId: string;
+  [key: string]: unknown;
+}
 
-const fetchWatchlist = async () => {
+interface WatchlistState {
+  items: Record<string, boolean>;
+  isHydrated: boolean;
+  error: string | null;
+}
+
+const fetchWatchlist = async (): Promise<WatchlistItem[]> => {
   const { data } = await axios.get('/api/watchlist');
   return data.data; // array of { id, contentId, addedAt }
 };
 
-const addToWatchlistApi = async (contentId) => {
+const addToWatchlistApi = async (contentId: string): Promise<unknown> => {
   const { data } = await axios.post('/api/watchlist', { contentId });
   return data.data;
 };
 
-const removeFromWatchlistApi = async (contentId) => {
+const removeFromWatchlistApi = async (contentId: string): Promise<unknown> => {
   const { data } = await axios.delete('/api/watchlist', { data: { contentId } });
   return data.data;
 };
-
 
 const watchlistSlice = createSlice({
   name: 'watchlist',
@@ -26,9 +35,9 @@ const watchlistSlice = createSlice({
     items: {},
     isHydrated: false,
     error: null,
-  },
+  } as WatchlistState,
   reducers: {
-    hydrateWatchlist: (state, action) => {
+    hydrateWatchlist: (state, action: PayloadAction<WatchlistItem[]>) => {
       state.items = {};
       (action.payload || []).forEach(({ contentId }) => {
         state.items[contentId] = true;
@@ -36,13 +45,13 @@ const watchlistSlice = createSlice({
       state.isHydrated = true;
       state.error = null;
     },
-    optimisticAdd: (state, action) => {
+    optimisticAdd: (state, action: PayloadAction<string>) => {
       state.items[action.payload] = true;
     },
-    optimisticRemove: (state, action) => {
+    optimisticRemove: (state, action: PayloadAction<string>) => {
       delete state.items[action.payload];
     },
-    revertItem: (state, action) => {
+    revertItem: (state, action: PayloadAction<{ contentId: string; wasInList: boolean }>) => {
       const { contentId, wasInList } = action.payload;
       if (wasInList) {
         state.items[contentId] = true;
@@ -50,7 +59,7 @@ const watchlistSlice = createSlice({
         delete state.items[contentId];
       }
     },
-    setError: (state, action) => {
+    setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
     clearError: (state) => {
@@ -87,6 +96,12 @@ export function useWatchlist() {
   });
 }
 
+interface ToggleWatchlistReturn {
+  inList: boolean;
+  toggle: () => void;
+  isLoading: boolean;
+}
+
 /**
  * useToggleWatchlist(contentId)
  * Self-contained hook for a single card/button.
@@ -95,11 +110,11 @@ export function useWatchlist() {
  * Usage (inside WatchlistButton):
  *   const { inList, toggle, isLoading } = useToggleWatchlist(movieId);
  */
-export function useToggleWatchlist(contentId) {
+export function useToggleWatchlist(contentId: string): ToggleWatchlistReturn {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
-  const inList = useSelector((state) => !!state.watchlist.items[contentId]);
+  const inList = useSelector((state: any) => !!state.watchlist.items[contentId]);
 
   const addMutation = useMutation({
     mutationFn: () => addToWatchlistApi(contentId),
@@ -129,7 +144,7 @@ export function useToggleWatchlist(contentId) {
     },
   });
 
-  const toggle = () => {
+  const toggle = (): void => {
     if (inList) {
       removeMutation.mutate();
     } else {
