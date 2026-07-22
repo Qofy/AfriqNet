@@ -1,10 +1,16 @@
 "use client";
 
 import { Plus, Check, Loader2 } from "lucide-react";
+import { FC } from "react";
 import { useToggleWatchlist } from "../features/watchlistSlice";
 
-export default function WatchlistButton({ movieId }) {
-  const { inList, toggle, isLoading } = useToggleWatchlist(movieId);
+interface WatchlistButtonProps {
+  movieId?: string | number;
+}
+
+const WatchlistButton: FC<WatchlistButtonProps> = ({ movieId }) => {
+  if (!movieId) return null;
+  const { inList, toggle, isLoading } = useToggleWatchlist(String(movieId));
 
   return (
     <button
@@ -25,4 +31,6 @@ export default function WatchlistButton({ movieId }) {
       <span>{inList ? "In Watchlist" : "Add to Watchlist"}</span>
     </button>
   );
-}
+};
+
+export default WatchlistButton;

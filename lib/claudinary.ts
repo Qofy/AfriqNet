@@ -24,7 +24,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function uploadImage(image) {
+export async function uploadImage(image: File): Promise<string> {
   // Mock upload for local development when Cloudinary is not configured
   if (isLocalDev) {
     console.log('[DEV] Using mock image upload for:', image.name || 'uploaded-image');

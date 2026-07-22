@@ -55,12 +55,12 @@ const SearchBar: FC<SearchBarProps> = ({
 
       {enableGlobalSearch && globalResults.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a2e] border border-[#a2cbf9]/30 rounded-lg shadow-lg max-h-64 overflow-y-auto z-50">
-          {globalResults.slice(0, 5).map((result) => (
+          {globalResults.slice(0, 5).map((result, index) => (
             <div
-              key={result.id}
+              key={(result.id as string | number) ?? index}
               className="px-4 py-2 hover:bg-[#a2cbf9]/10 cursor-pointer text-[#a2cbf9] text-sm"
             >
-              {result.title || result.name}
+              {String(result.title || result.name || "")}
             </div>
           ))}
           {globalResults.length > 5 && (

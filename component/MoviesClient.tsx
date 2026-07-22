@@ -41,7 +41,8 @@ const MoviesClient: FC<MoviesClientProps> = ({ initialMovies = [], genres = { mo
   const [activeGenre, setActiveGenre] = useState(initialGenre);
 
   const { data: moviesData = [], isLoading, error } = useMovies(page);
-  const movies = moviesData.length > 0 ? moviesData : initialMovies;
+  const movies = moviesData.length > 0 ? (moviesData as Movie[]) : initialMovies;
+  const errorMessage = error ? (typeof error === 'string' ? error : typeof error === 'object' && error !== null && 'message' in error ? String((error as Record<string, unknown>).message) : 'An error occurred') : null;
 
   const filtered = movies.filter((movie: Movie) => {
     const title = movie.title || movie.name || "";
@@ -62,7 +63,7 @@ const MoviesClient: FC<MoviesClientProps> = ({ initialMovies = [], genres = { mo
           <p className="text-[#a2cbf9]">
             {isLoading ? "Loading..." : `${movies.length} titles available`}
           </p>
-          {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
+          {errorMessage && <p className="text-red-400 text-sm mt-1">{errorMessage}</p>}
 
           {/* Search */}
           <SearchBar value={search} onChange={(v) => setSearch(v)} />

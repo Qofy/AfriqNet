@@ -1,16 +1,29 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Play, Plus, Info } from "lucide-react";
+import { FC } from "react";
 import { sampleMovies } from "@/component/data/sampleData";
 
+interface Movie {
+  id: string | number;
+  title?: string;
+  poster?: string;
+  rating?: number;
+  release_date?: string;
+  [key: string]: unknown;
+}
 
-export const MovieCard = ({ movie }) => (
+interface MovieCardProps {
+  movie: Movie;
+}
+
+export const MovieCard: FC<MovieCardProps> = ({ movie }) => (
   <Link href={`/detail?id=${movie.id}`} className="shrink-0 w-48 group cursor-pointer block">
     <div className="relative h-72 rounded-lg overflow-hidden bg-linear-to-br from-[#38cff0] to-[#039aec] transition-all transform group-hover:scale-105">
       {movie.poster ? (
         <Image
           src={movie.poster}
-          alt={movie.title}
+          alt={movie.title || "Movie poster"}
           fill
           className="object-cover object-center"
         />

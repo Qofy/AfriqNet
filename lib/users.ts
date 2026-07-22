@@ -1,10 +1,18 @@
-import { createUser, getUserByEmail } from "./db.server.js";
+import { createUser, getUserByEmail } from "./db.server";
 
-export function createUsers(name, email, passwordHash) {
-  // Use the helper from db.server.js which has correct column names
-  return createUser({ name, email, passwordHash });
+interface User {
+  id: string;
+  name?: string;
+  email?: string;
+  password?: string;
+  [key: string]: unknown;
 }
 
-export default function  getUserByEmailWrapper(email) {
-  return getUserByEmail(email);
+export async function createUsers(name: string, email: string, passwordHash: string): Promise<Record<string, unknown>> {
+  // Use the helper from db.server which has correct column names
+  return await createUser({ name, email, passwordHash });
+}
+
+export async function getUserByEmailWrapper(email: string): Promise<Record<string, unknown> | null> {
+  return await getUserByEmail(email);
 }

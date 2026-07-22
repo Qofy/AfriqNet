@@ -1,16 +1,30 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Play, Plus, Info } from "lucide-react";
 
-export default function MovieCardWithTrailer({ movie }) {
-  const [showTrailer, setShowTrailer] = useState(false);
-  const videoRef = useRef(null);
-  const hoverTimeoutRef = useRef(null);
+interface Movie {
+  id: string | number;
+  title?: string;
+  poster?: string;
+  trailer?: string;
+  rating?: number;
+  release_date?: string;
+  [key: string]: unknown;
+}
 
-  const handleMouseEnter = () => {
+interface MovieCardWithTrailerProps {
+  movie: Movie;
+}
+
+const MovieCardWithTrailer: FC<MovieCardWithTrailerProps> = ({ movie }) => {
+  const [showTrailer, setShowTrailer] = useState<boolean>(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = (): void => {
     if (movie.trailer) {
       hoverTimeoutRef.current = setTimeout(() => {
         setShowTrailer(true);
@@ -18,7 +32,7 @@ export default function MovieCardWithTrailer({ movie }) {
     }
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (): void => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
     }
@@ -57,7 +71,7 @@ export default function MovieCardWithTrailer({ movie }) {
         {movie.poster && !showTrailer && (
           <Image
             src={movie.poster}
-            alt={movie.title}
+            alt={movie.title || "Movie poster"}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
             className="object-cover object-center"
@@ -123,4 +137,6 @@ export default function MovieCardWithTrailer({ movie }) {
       </div>
     </Link>
   );
-}
+};
+
+export default MovieCardWithTrailer;

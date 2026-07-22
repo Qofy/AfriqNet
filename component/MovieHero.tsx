@@ -1,15 +1,38 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, FC } from "react";
 import Image from "next/image";
 import { Play, Share2, Star, Clock, Calendar, Volume, VolumeX } from "lucide-react";
 import PlayButton from "./PlayButton.client";
 import WatchlistButton from "./WatchlistButton";
 
-export const MovieHero = ({ movie }) => {
-  const videoRef = useRef(null);
-  const [muted, setMuted] = useState(true);
-  const [playing, setPlaying] = useState(true);
+interface Movie {
+  id?: string | number;
+  title?: string;
+  name?: string;
+  poster?: string;
+  backdrop?: string;
+  trailer?: string | null;
+  stream?: string | null;
+  video_stram?: string;
+  rating?: number;
+  release_date?: string;
+  first_air_date?: string;
+  runtime?: number;
+  number_of_seasons?: number;
+  type?: string;
+  tagline?: string;
+  [key: string]: unknown;
+}
+
+interface MovieHeroProps {
+  movie: Movie;
+}
+
+export const MovieHero: FC<MovieHeroProps> = ({ movie }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState<boolean>(true);
+  const [playing, setPlaying] = useState<boolean>(true);
 
   // Determine content type - if it has a stream field, it's likely a music video
   const contentType = movie?.stream && !movie?.video_stram ? "music_video" : "movie";
@@ -63,7 +86,7 @@ export const MovieHero = ({ movie }) => {
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover"
-            src={movie.trailer || movie.stream}
+            src={(movie.trailer || movie.stream) as string}
             loop
             playsInline
             muted={muted}
@@ -96,8 +119,8 @@ export const MovieHero = ({ movie }) => {
       ) : movie?.backdrop || movie?.poster ? (
         <>
           <Image
-            src={movie.backdrop || movie.poster}
-            alt={movie.title || movie.name}
+            src={(movie.backdrop || movie.poster) as string}
+            alt={movie.title || movie.name || "Movie"}
             fill
             priority
             className="object-cover object-center"
@@ -117,7 +140,7 @@ export const MovieHero = ({ movie }) => {
               <div className="hidden md:block shrink-0 w-48 md:w-56 lg:w-64">
                 <div className="relative aspect-2/3 rounded-lg overflow-hidden shadow-2xl">
                   {movie?.poster ? (
-                    <Image src={movie.poster} alt={movie.title || movie.name} fill className="object-cover" />
+                    <Image src={movie.poster} alt={movie.title || movie.name || "Movie"} fill className="object-cover" />
                   ) : (
                     <div className="w-full h-full bg-linear-to-br from-[#38cff0] to-[#039aec] flex items-center justify-center">
                       <Play size={60} className="text-white/50" />
@@ -141,7 +164,7 @@ export const MovieHero = ({ movie }) => {
                   {(movie?.release_date || movie?.first_air_date) && (
                     <div className="flex items-center gap-2">
                       <Calendar size={16} />
-                      <span>{new Date(movie.release_date || movie.first_air_date).getFullYear()}</span>
+                      <span>{new Date(movie.release_date || movie.first_air_date as string).getFullYear()}</span>
                     </div>
                   )}
                   {(movie?.runtime || movie?.number_of_seasons) && (
@@ -179,7 +202,7 @@ export const MovieHero = ({ movie }) => {
       {/* Mobile poster thumbnail */}
       {movie?.poster && (
         <div className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2 w-24 h-32 rounded-md overflow-hidden shadow-lg">
-          <Image src={movie.poster} alt={movie.title || movie.name} fill className="object-cover" />
+          <Image src={movie.poster} alt={movie.title || movie.name || "Movie"} fill className="object-cover" />
         </div>
       )}
     </section>

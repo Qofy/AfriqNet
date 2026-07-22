@@ -90,8 +90,9 @@ export function useWatchlist() {
     onSuccess: (data) => {
       dispatch(hydrateWatchlist(data));
     },
-    onError: (err) => {
-      dispatch(setError(err?.response?.data?.error || err.message));
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : (err as any)?.response?.data?.error || 'An error occurred';
+      dispatch(setError(errorMessage));
     },
   });
 }
@@ -155,6 +156,6 @@ export function useToggleWatchlist(contentId: string): ToggleWatchlistReturn {
   return {
     inList,
     toggle,
-    isLoading: addMutation.isPending || removeMutation.isPending,
+    isLoading: ((addMutation as any).isPending || (addMutation as any).isLoading) || ((removeMutation as any).isPending || (removeMutation as any).isLoading) || false,
   };
 }

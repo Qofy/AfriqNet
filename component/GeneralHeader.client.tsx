@@ -2,19 +2,35 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, FC, ChangeEvent, MouseEvent } from "react";
 import { usePathname } from "next/navigation";
 import { Home, Film, Tv, List, Music, User, Camera } from "lucide-react";
-// import { logout } from "@/actions/auth-action";
+import { logout } from "@/actions/auth-action";
 
-export default function GeneralHeaderClient({ authverification }) {
+interface AuthUser {
+  id?: string;
+  profileImage?: string | null;
+  [key: string]: unknown;
+}
+
+interface AuthVerification {
+  user?: AuthUser;
+  session?: unknown;
+  [key: string]: unknown;
+}
+
+interface GeneralHeaderClientProps {
+  authverification?: AuthVerification;
+}
+
+const GeneralHeaderClient: FC<GeneralHeaderClientProps> = ({ authverification }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [profileUrl, setProfileUrl] = useState(
-    authverification?.user?.profileImage || null
+  const [profileUrl, setProfileUrl] = useState<string | null>(
+    (authverification?.user?.profileImage as string | null) || null
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const inputRef = useRef(null);
-  const dropdownRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
   const links = [
@@ -26,10 +42,10 @@ export default function GeneralHeaderClient({ authverification }) {
   ];
 
   // Check if current path is active
-  const isActiveLink = (linkPath) => pathname === linkPath;
+  const isActiveLink = (linkPath: string): boolean => pathname === linkPath;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = (): void => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
@@ -37,8 +53,8 @@ export default function GeneralHeaderClient({ authverification }) {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: Event): void => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
@@ -54,7 +70,7 @@ export default function GeneralHeaderClient({ authverification }) {
     };
   }, [isDropdownOpen]);
 
-  async function handleFileChange(e) {
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>): Promise<void> {
     const f = e.target.files?.[0];
     if (!f) return;
     try {
@@ -238,4 +254,6 @@ export default function GeneralHeaderClient({ authverification }) {
       </div>
     </>
   );
-}
+};
+
+export default GeneralHeaderClient;

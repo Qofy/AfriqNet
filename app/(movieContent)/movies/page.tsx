@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import MoviesClient from "@/component/MoviesClient";
 import { getAllGenres, getAllMovies } from "../../../lib/db.server";
 
@@ -23,5 +24,9 @@ export default function MoviesPage() {
     throw new Error("Loading movies failed. Please try again later.");
   }
 
-  return <MoviesClient initialMovies={movies} genres={genres} />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MoviesClient initialMovies={movies} genres={genres} />
+    </Suspense>
+  );
 }

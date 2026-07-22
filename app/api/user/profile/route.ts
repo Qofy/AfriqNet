@@ -12,6 +12,7 @@ interface Updates {
   name?: string;
   email?: string;
   profile_image?: string;
+  [key: string]: unknown;
 }
 
 export async function PATCH(req: NextRequest): Promise<NextResponse> {

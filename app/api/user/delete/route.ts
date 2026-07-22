@@ -11,7 +11,7 @@ export async function DELETE(): Promise<NextResponse> {
     }
 
     // Delete all user sessions via Lucia adapter
-    await lucia.invalidateAllUserSessions(session.userId);
+    await lucia.invalidateUserSessions(session.userId);
 
     // Delete watch progress
     await deleteWatchProgressForUser(session.userId);

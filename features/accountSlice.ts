@@ -79,9 +79,13 @@ const accountSlice = createSlice({
       state.passwordData = { ...state.passwordData, ...action.payload };
     },
     togglePasswordVisibility: (state, action: PayloadAction<string>) => {
-      const field = action.payload as keyof AccountState;
-      if (typeof state[field] === 'boolean') {
-        state[field] = !state[field];
+      const field = action.payload;
+      if (field === 'showCurrentPassword') {
+        state.showCurrentPassword = !state.showCurrentPassword;
+      } else if (field === 'showNewPassword') {
+        state.showNewPassword = !state.showNewPassword;
+      } else if (field === 'showConfirmPassword') {
+        state.showConfirmPassword = !state.showConfirmPassword;
       }
     },
     setDeleteConfirm: (state, action: PayloadAction<string>) => {
@@ -144,50 +148,50 @@ export const {
 
 
 // Regular async functions
-export const uploadProfileImage = async (file) => {
+export const uploadProfileImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
-  
+
   const response = await fetch('/api/upload/profile', {
     method: 'POST',
     body: formData,
   });
-  
+
   const result = await response.json();
   if (!response.ok) {
     throw new Error(result.error || 'Upload failed');
   }
-  
+
   // Update user profile with new image URL
   const updateResponse = await fetch('/api/user/profile', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ profileUrl: result.url })
   });
-  
+
   if (!updateResponse.ok) {
     throw new Error('Failed to update profile');
   }
-  
+
   return result.url;
 };
 
-export const updateProfile = async (profileData) => {
+export const updateProfile = async (profileData: Partial<FormData>): Promise<Partial<FormData>> => {
   const response = await fetch('/api/user/profile', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(profileData)
   });
-  
+
   const result = await response.json();
   if (!response.ok) {
     throw new Error(result.error || 'Update failed');
   }
-  
+
   return profileData;
 };
 
-export const changePassword = async (passwordData) => {
+export const changePassword = async (passwordData: PasswordData): Promise<void> => {
   const response = await fetch('/api/user/password', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -201,8 +205,6 @@ export const changePassword = async (passwordData) => {
   if (!response.ok) {
     throw new Error(result.error || 'Password change failed');
   }
-  
-  return true;
 };
 
 export const deleteAccount = async () => {

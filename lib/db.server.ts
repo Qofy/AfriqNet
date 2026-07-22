@@ -13,7 +13,7 @@ interface Movie {
   runtime: number;
   tagline: string;
   video_stram: string;
-  trailer: string;
+  trailer?: string | null;
   [key: string]: unknown;
 }
 
@@ -24,9 +24,12 @@ interface TVShow {
   poster: string;
   backdrop: string;
   rating: number;
-  release_date: string;
+  release_date?: string;
+  first_air_date?: string;
   overview: string;
   genre_ids: number[];
+  number_of_seasons?: number;
+  status?: string;
   [key: string]: unknown;
 }
 
@@ -707,7 +710,7 @@ export function searchContent(query: string, contentType: string | null = null):
 // DYNAMIC FIRESTORE FUNCTIONS (async, database operations)
 // ============================================================================
 
-export async function createUser({ name, email, passwordHash }) {
+export async function createUser({ name, email, passwordHash }: { name: string; email: string; passwordHash: string }) {
   const now = Date.now();
   const docRef = await getFirestoreDb().collection('users').add({
     id: '', // will be set to docRef.id below
@@ -727,11 +730,11 @@ export async function createUser({ name, email, passwordHash }) {
   };
 }
 
-export async function getUserByEmail(email) {
+export async function getUserByEmail(email: string) {
   const snap = await getFirestoreDb().collection('users').where('email', '==', email).limit(1).get();
   if (snap.empty) return null;
   const doc = snap.docs[0];
-  const data = doc.data();
+  const data = doc.data()!;
   return {
     id: doc.id,
     ...data,
@@ -739,19 +742,19 @@ export async function getUserByEmail(email) {
   };
 }
 
-export async function getUserById(id) {
+export async function getUserById(id: string): Promise<(Record<string, unknown> & { id: string; profileImage: any }) | null> {
   const doc = await getFirestoreDb().collection('users').doc(id).get();
   if (!doc.exists) return null;
-  const data = doc.data();
+  const data = doc.data()!;
   return {
     id: doc.id,
     ...data,
     profileImage: data.profile_image || null
-  };
+  } as Record<string, unknown> & { id: string; profileImage: any };
 }
 
-export async function updateUser(userId, fields) {
-  const updates = {};
+export async function updateUser(userId: string, fields: Record<string, unknown>) {
+  const updates: Record<string, unknown> = {};
   if (fields.name !== undefined) updates.name = fields.name;
   if (fields.email !== undefined) updates.email = fields.email;
   if (fields.profile_image !== undefined) updates.profile_image = fields.profile_image;
@@ -763,20 +766,20 @@ export async function updateUser(userId, fields) {
   return getUserById(userId);
 }
 
-export async function updateUserProfileImage(userId, url) {
+export async function updateUserProfileImage(userId: string, url: string) {
   await getFirestoreDb().collection('users').doc(userId).update({ profile_image: url });
   return getUserById(userId);
 }
 
-export async function updateUserPassword(userId, passwordHash) {
+export async function updateUserPassword(userId: string, passwordHash: string) {
   await getFirestoreDb().collection('users').doc(userId).update({ password: passwordHash });
 }
 
-export async function deleteUser(userId) {
+export async function deleteUser(userId: string) {
   await getFirestoreDb().collection('users').doc(userId).delete();
 }
 
-export async function createSession({ id, userId, expiresAt }) {
+export async function createSession({ id, userId, expiresAt }: { id: string; userId: string; expiresAt: Date }) {
   const now = Date.now();
   await getFirestoreDb().collection('sessions').doc(id).set({
     user_id: userId,
@@ -786,10 +789,10 @@ export async function createSession({ id, userId, expiresAt }) {
   return { id, userId, expiresAt, created_at: now };
 }
 
-export async function getSession(id) {
+export async function getSession(id: string) {
   const doc = await getFirestoreDb().collection('sessions').doc(id).get();
   if (!doc.exists) return null;
-  const data = doc.data();
+  const data = doc.data()!;
   return {
     id: doc.id,
     userId: data.user_id,
@@ -798,25 +801,27 @@ export async function getSession(id) {
   };
 }
 
-export async function deleteSession(id) {
+export async function deleteSession(id: string) {
   await getFirestoreDb().collection('sessions').doc(id).delete();
 }
 
-export async function deleteUserSessions(userId) {
-  const snap = await getFirestoreDb().collection('sessions').where('user_id', '==', userId).get();
-  const batch = firestoreDb.batch();
-  snap.docs.forEach(doc => batch.delete(doc.ref));
+export async function deleteUserSessions(userId: string) {
+  const db = getFirestoreDb();
+  const snap = await db.collection('sessions').where('user_id', '==', userId).get();
+  const batch = db.batch();
+  snap.docs.forEach((doc: any) => batch.delete(doc.ref));
   if (snap.docs.length > 0) await batch.commit();
 }
 
-export async function deleteExpiredSessions() {
-  const snap = await getFirestoreDb().collection('sessions').where('expires_at', '<', Date.now()).get();
-  const batch = firestoreDb.batch();
-  snap.docs.forEach(doc => batch.delete(doc.ref));
+export async function deleteExpiredSessions(): Promise<void> {
+  const db = getFirestoreDb();
+  const snap = await db.collection('sessions').where('expires_at', '<', Date.now()).get();
+  const batch = db.batch();
+  snap.docs.forEach((doc: any) => batch.delete(doc.ref));
   if (snap.docs.length > 0) await batch.commit();
 }
 
-export async function upsertWatchProgress({ userId, contentId, position, duration }) {
+export async function upsertWatchProgress({ userId, contentId, position, duration }: { userId: string; contentId: string; position: number; duration?: number }) {
   const now = Date.now();
   const docKey = `${userId}_${contentId}`;
   await getFirestoreDb().collection('watch_progress').doc(docKey).set(
@@ -839,11 +844,11 @@ export async function upsertWatchProgress({ userId, contentId, position, duratio
   };
 }
 
-export async function getWatchProgress(userId, contentId) {
+export async function getWatchProgress(userId: string, contentId: string) {
   const docKey = `${userId}_${contentId}`;
   const doc = await getFirestoreDb().collection('watch_progress').doc(docKey).get();
   if (!doc.exists) return null;
-  const data = doc.data();
+  const data = doc.data()!;
   return {
     id: doc.id,
     userId: data.user_id,
@@ -854,30 +859,31 @@ export async function getWatchProgress(userId, contentId) {
   };
 }
 
-export async function deleteWatchProgressForUser(userId) {
-  const snap = await getFirestoreDb().collection('watch_progress').where('user_id', '==', userId).get();
-  const batch = firestoreDb.batch();
-  snap.docs.forEach(doc => batch.delete(doc.ref));
+export async function deleteWatchProgressForUser(userId: string): Promise<void> {
+  const db = getFirestoreDb();
+  const snap = await db.collection('watch_progress').where('user_id', '==', userId).get();
+  const batch = db.batch();
+  snap.docs.forEach((doc: any) => batch.delete(doc.ref));
   if (snap.docs.length > 0) await batch.commit();
 }
 
 // ─── Watchlist ──────────────────────────────────────────────────────────────
 
-export async function getWatchlist(userId) {
+export async function getWatchlist(userId: string) {
   const snap = await getFirestoreDb()
     .collection('watchlists')
     .where('user_id', '==', userId)
     .get();
   return snap.docs
-    .map((doc) => ({
+    .map((doc: any) => ({
       id: doc.id,
       contentId: doc.data().content_id,
       addedAt: doc.data().added_at,
     }))
-    .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    .sort((a: any, b: any) => (b.addedAt || 0) - (a.addedAt || 0));
 }
 
-export async function addToWatchlist(userId, contentId) {
+export async function addToWatchlist(userId: string, contentId: string) {
   const docKey = `${userId}_${contentId}`;
   await getFirestoreDb()
     .collection('watchlists')
@@ -886,13 +892,13 @@ export async function addToWatchlist(userId, contentId) {
   return { id: docKey, contentId, userId };
 }
 
-export async function removeFromWatchlist(userId, contentId) {
+export async function removeFromWatchlist(userId: string, contentId: string) {
   const docKey = `${userId}_${contentId}`;
   await getFirestoreDb().collection('watchlists').doc(docKey).delete();
   return { contentId };
 }
 
-export async function isInWatchlist(userId, contentId) {
+export async function isInWatchlist(userId: string, contentId: string) {
   const docKey = `${userId}_${contentId}`;
   const doc = await getFirestoreDb().collection('watchlists').doc(docKey).get();
   return doc.exists;

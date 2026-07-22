@@ -1,7 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
 
-let firestoreDb = null;
+let firestoreDb: Firestore | null = null;
 
 function initializeFirebase() {
   if (firestoreDb) return firestoreDb;
@@ -23,8 +23,9 @@ function initializeFirebase() {
     }
     firestoreDb = getFirestore();
     return firestoreDb;
-  } catch (err) {
-    const msg = `Firebase initialization failed: ${err.message}`;
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    const msg = `Firebase initialization failed: ${errorMessage}`;
     if (process.env.NODE_ENV === 'production') {
       throw new Error(msg);
     }

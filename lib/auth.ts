@@ -7,6 +7,7 @@ interface SessionData {
   userId: string;
   expiresAt: Date;
   fresh: boolean;
+  attributes?: Record<string, unknown>;
 }
 
 interface UserData {
@@ -20,7 +21,7 @@ interface SessionAndUserResult {
 }
 
 const adapter = {
-  async getSessionAndUser(sessionId: string): Promise<[SessionData | null, UserData | null]> {
+  async getSessionAndUser(sessionId: string): Promise<[any, any]> {
     const db = getFirestoreDb();
     const sessionDoc = await db.collection("sessions").doc(sessionId).get();
     if (!sessionDoc.exists) return [null, null];
@@ -36,22 +37,22 @@ const adapter = {
         fresh: false
       },
       {
-        id: userData?.id || userDoc.id,
-        ...userData
+        ...userData,
+        id: userData?.id || userDoc.id
       } as UserData
     ];
   },
-  async getUserSessions(userId: string): Promise<SessionData[]> {
+  async getUserSessions(userId: string): Promise<any[]> {
     const db = getFirestoreDb();
     const snap = await db.collection("sessions").where("user_id", "==", userId).get();
-    return snap.docs.map(doc => ({
+    return snap.docs.map((doc: any) => ({
       id: doc.id,
       userId: doc.data().user_id,
       expiresAt: new Date(doc.data().expires_at),
       fresh: false
     }));
   },
-  async setSession(session: SessionData): Promise<void> {
+  async setSession(session: any): Promise<void> {
     const db = getFirestoreDb();
     await db.collection("sessions").doc(session.id).set({
       user_id: session.userId,
@@ -68,30 +69,30 @@ const adapter = {
     const db = getFirestoreDb();
     await db.collection("sessions").doc(sessionId).delete();
   },
-  async deleteUserSessions(userId) {
+  async deleteUserSessions(userId: string): Promise<void> {
     const db = getFirestoreDb();
     const snap = await db.collection("sessions").where("user_id", "==", userId).get();
     const batch = db.batch();
-    snap.docs.forEach(doc => batch.delete(doc.ref));
+    snap.docs.forEach((doc: any) => batch.delete(doc.ref));
     if (snap.docs.length > 0) await batch.commit();
   },
-  async deleteExpiredSessions() {
+  async deleteExpiredSessions(): Promise<void> {
     const db = getFirestoreDb();
     const snap = await db.collection("sessions").where("expires_at", "<", Date.now()).get();
     const batch = db.batch();
-    snap.docs.forEach(doc => batch.delete(doc.ref));
+    snap.docs.forEach((doc: any) => batch.delete(doc.ref));
     if (snap.docs.length > 0) await batch.commit();
   }
 };
 
-export const lucia = new Lucia(adapter,{
-    sessionCookies:{
-        expires:false,
-        attributes:{
+export const lucia = new Lucia(adapter, {
+    sessionCookie: {
+        expires: false,
+        attributes: {
             secure: process.env.NODE_ENV === "production"
         }
     },
-    getUserAttributes: (attributes) => {
+    getUserAttributes: (attributes: any) => {
         if (!attributes) {
             return {
                 id: '',
@@ -109,7 +110,7 @@ export const lucia = new Lucia(adapter,{
     }
 });
 
-export async function createAuthSession(userId) {
+export async function createAuthSession(userId: string) {
    const session = await lucia.createSession(userId, {});
    const sessionCookie = lucia.createSessionCookie(session.id);
    const cookiesStore = await cookies();
@@ -142,7 +143,7 @@ export async function verifyAuth() {
     const result = await lucia.validateSession(sessionId);
     try{
         if(result.session && result.session.fresh){
-            const sessionCookie = lucia.createSessionCookie(result.session);
+            const sessionCookie = lucia.createSessionCookie(result.session.id);
              const cookiesStore = await cookies();
     cookiesStore.set(
         sessionCookie.name,

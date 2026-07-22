@@ -2,21 +2,28 @@
 
 import { useRouter } from "next/navigation";
 import { Play } from "lucide-react";
+import { FC, MouseEvent } from "react";
 
-export default function PlayButton({
+interface PlayButtonProps {
+  movieId?: string | number;
+  contentType?: string;
+  className?: string;
+}
+
+const PlayButton: FC<PlayButtonProps> = ({
   movieId,
-  contentType = "movie", // 'movie' or 'music_video'
+  contentType = "movie",
   className =
     "btn-color cursor-pointer btn-hover text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold flex items-center gap-2 sm:gap-3 transition-all transform hover:scale-105 text-sm sm:text-base",
-}) {
+}) => {
   const router = useRouter();
 
-  function handleClick(e) {
+  const handleClick = (e: MouseEvent<HTMLButtonElement>): void => {
     e?.preventDefault();
     if (!movieId) return;
     // SPA navigate to watching page with autoplay flag and content type
     router.push(`/watching?id=${movieId}&type=${contentType}&autoplay=1`);
-  }
+  };
 
   return (
     <button onClick={handleClick} className={className} aria-label="Play">
@@ -24,4 +31,6 @@ export default function PlayButton({
       <span>Play Now</span>
     </button>
   );
-}
+};
+
+export default PlayButton;

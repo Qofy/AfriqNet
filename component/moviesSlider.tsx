@@ -1,11 +1,31 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, FC } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play, Info, Star } from "lucide-react";
 import { sampleMovies } from "@/component/data/sampleData";
 import PlayButton from "./PlayButton.client";
-export default function MovieSlider({ movies = sampleMovies }) {
+
+interface Movie {
+  id?: string | number;
+  title?: string;
+  backdrop?: string;
+  poster?: string;
+  rating?: number;
+  release_date?: string;
+  runtime?: number;
+  tagline?: string;
+  overview?: string;
+  stream?: string | null;
+  video_stram?: string;
+  [key: string]: unknown;
+}
+
+interface MovieSliderProps {
+  movies?: Movie[];
+}
+
+const MovieSlider: FC<MovieSliderProps> = ({ movies = sampleMovies as Movie[] }) => {
   // Use a deterministic initial index for SSR (avoids hydration mismatch).
   // Pick a random slide only on the client after mount.
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -13,8 +33,8 @@ export default function MovieSlider({ movies = sampleMovies }) {
   const [fade, setFade] = useState(true);
 
   // Get random movie from the array
-  const getRandomIndex = useCallback((excludeIndex) => {
-    let randomIndex;
+  const getRandomIndex = useCallback((excludeIndex: number): number => {
+    let randomIndex: number;
     do {
       randomIndex = Math.floor(Math.random() * movies.length);
     } while (randomIndex === excludeIndex && movies.length > 1);
@@ -64,7 +84,7 @@ export default function MovieSlider({ movies = sampleMovies }) {
     }, 300);
   };
 
-  const goToSlide = (index) => {
+  const goToSlide = (index: number): void => {
     setIsAutoPlay(false);
     setFade(false);
     setTimeout(() => {
@@ -97,7 +117,7 @@ export default function MovieSlider({ movies = sampleMovies }) {
         {currentMovie?.backdrop || currentMovie?.poster ? (
           <>
             <Image
-              src={currentMovie.backdrop || currentMovie.poster}
+              src={(currentMovie.backdrop || currentMovie.poster) as string}
               alt={currentMovie.title || "Movie backdrop"}
               fill
               sizes="20"
@@ -216,4 +236,6 @@ export default function MovieSlider({ movies = sampleMovies }) {
     </div>
 
   );
-}
+};
+
+export default MovieSlider;

@@ -1,14 +1,35 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Clapperboard } from "lucide-react";
 
-function MovieGridCard({ movie }) {
-  const [showVideo, setShowVideo] = useState(false);
-  const videoRef = useRef(null);
-  const hoverTimeoutRef = useRef(null);
+interface Movie {
+  id: string | number;
+  title?: string;
+  name?: string;
+  poster?: string;
+  trailer?: string;
+  stream?: string | null;
+  rating?: number;
+  release_date?: string;
+  first_air_date?: string;
+  runtime?: number;
+  number_of_seasons?: number;
+  tagline?: string;
+  overview?: string;
+  [key: string]: unknown;
+}
+
+interface MovieGridCardProps {
+  movie: Movie;
+}
+
+const MovieGridCard: FC<MovieGridCardProps> = ({ movie }) => {
+  const [showVideo, setShowVideo] = useState<boolean>(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseEnter = () => {
     if (movie.trailer || movie.stream) {
@@ -58,7 +79,7 @@ function MovieGridCard({ movie }) {
         {movie.poster && !showVideo && (
           <Image
             src={movie.poster}
-            alt={movie.title || movie.name}
+            alt={movie.title || movie.name || "Movie"}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
             className="object-cover object-center"
@@ -120,9 +141,13 @@ function MovieGridCard({ movie }) {
       </div>
     </Link>
   );
+};
+
+interface MoviesGridProps {
+  movies?: Movie[];
 }
 
-export default function MoviesGrid({ movies = [] }) {
+const MoviesGrid: FC<MoviesGridProps> = ({ movies = [] }) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
       {movies.map((movie) => (
@@ -130,4 +155,6 @@ export default function MoviesGrid({ movies = [] }) {
       ))}
     </div>
   );
-}
+};
+
+export default MoviesGrid;

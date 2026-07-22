@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { Readable } from 'stream';
 import path from 'path';
 import { type NextRequest } from 'next/server';
 import { getMovieById, getMusicVideoById } from '@/lib/db.server';
@@ -69,7 +70,8 @@ export async function GET(
       const end = ranges[1] ? parseInt(ranges[1], 10) : fileSize - 1;
       const chunkSize = (end - start) + 1;
 
-      const stream = fs.createReadStream(filePath, { start, end });
+      const nodeStream = fs.createReadStream(filePath, { start, end });
+      const webStream = Readable.toWeb(nodeStream) as ReadableStream<Uint8Array>;
 
       const headers = new Headers();
       headers.set('Content-Range', `bytes ${start}-${end}/${fileSize}`);
@@ -77,17 +79,18 @@ export async function GET(
       headers.set('Content-Length', String(chunkSize));
       headers.set('Content-Type', 'video/mp4');
 
-      return new Response(stream, { status: 206, headers });
+      return new Response(webStream, { status: 206, headers });
     }
 
     // No range requested, return whole file
-    const stream = fs.createReadStream(filePath);
+    const nodeStream = fs.createReadStream(filePath);
+    const webStream = Readable.toWeb(nodeStream) as ReadableStream<Uint8Array>;
     const headers = new Headers();
     headers.set('Content-Length', String(fileSize));
     headers.set('Content-Type', 'video/mp4');
     headers.set('Accept-Ranges', 'bytes');
 
-    return new Response(stream, { status: 200, headers });
+    return new Response(webStream, { status: 200, headers });
   } catch (error) {
       console.error('Streaming error:', error);
       return new Response('Internal server error', { status: 500 });

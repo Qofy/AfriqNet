@@ -1,24 +1,42 @@
 "use client"
 
-import { useState, useRef } from 'react';
+import { useState, useRef, FC, ChangeEvent, FormEvent } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { User, Camera, Save, Lock, Mail, UserCircle, Trash2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export default function ManageProfileClient({ user }) {
-  const router = useRouter();
-  const [profileUrl, setProfileUrl] = useState(user?.profileImage || null);
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
-  const inputRef = useRef(null);
+interface UserProfile {
+  id?: string;
+  name?: string;
+  email?: string;
+  profileImage?: string | null;
+  createdAt?: string | Date | number;
+  [key: string]: unknown;
+}
 
-  async function handleFileChange(e) {
+interface ManageProfileClientProps {
+  user: UserProfile;
+}
+
+interface MessageState {
+  type: string;
+  text: string;
+}
+
+const ManageProfileClient: FC<ManageProfileClientProps> = ({ user }) => {
+  const router = useRouter();
+  const [profileUrl, setProfileUrl] = useState<string | null>((user?.profileImage as string | null) || null);
+  const [name, setName] = useState<string>((user?.name as string) || '');
+  const [email, setEmail] = useState<string>((user?.email as string) || '');
+  const [currentPassword, setCurrentPassword] = useState<string>('');
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<MessageState>({ type: '', text: '' });
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>): Promise<void> {
     const f = e.target.files?.[0];
     if (!f) return;
     
@@ -55,7 +73,7 @@ export default function ManageProfileClient({ user }) {
     }
   }
 
-  async function handleUpdateProfile(e) {
+  async function handleUpdateProfile(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setLoading(true);
     setMessage({ type: '', text: '' });
@@ -83,7 +101,7 @@ export default function ManageProfileClient({ user }) {
     }
   }
 
-  async function handleChangePassword(e) {
+  async function handleChangePassword(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setLoading(true);
     setMessage({ type: '', text: '' });
@@ -125,7 +143,7 @@ export default function ManageProfileClient({ user }) {
     }
   }
 
-  async function handleDeleteAccount() {
+  async function handleDeleteAccount(): Promise<void> {
     if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       return;
     }
@@ -373,7 +391,7 @@ export default function ManageProfileClient({ user }) {
             </div>
             <div className="flex justify-between py-2 border-b border-gray-700/50">
               <span className="text-gray-400">Member Since</span>
-              <span>{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</span>
             </div>
           </div>
         </div>
@@ -401,4 +419,6 @@ export default function ManageProfileClient({ user }) {
       </div>
     </div>
   );
-}
+};
+
+export default ManageProfileClient;

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import TVShowsClient from "../../../component/TvShowsClient";
 import { getAllGenres, getAllTVShows } from "../../../lib/db.server";
 
@@ -36,5 +37,9 @@ export default function TvShowsPage() {
     throw new Error("Loading TV shows failed. Please try again later.");
   }
 
-  return <TVShowsClient initialShows={shows} genres={{ tv: genres.tv }} />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TVShowsClient initialShows={shows} genres={{ tv: genres.tv }} />
+    </Suspense>
+  );
 }

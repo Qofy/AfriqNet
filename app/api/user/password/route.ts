@@ -33,7 +33,7 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
     }
 
     // Verify current password
-    const validPassword = await verify(user.password, currentPassword, {
+    const validPassword = await verify(user.password as string, currentPassword, {
       memoryCost: 19456,
       timeCost: 2,
       outputLen: 32,

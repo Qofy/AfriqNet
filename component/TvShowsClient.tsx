@@ -41,7 +41,8 @@ const TVShowsClient: FC<TVShowsClientProps> = ({ initialShows = [], genres = { t
   const [activeGenre, setActiveGenre] = useState(initialGenre);
 
   const { data: showsData = [], isLoading, error } = useTvShows(page);
-  const shows = showsData.length > 0 ? showsData : initialShows;
+  const shows = showsData.length > 0 ? (showsData as Show[]) : initialShows;
+  const errorMessage = error ? (typeof error === 'string' ? error : typeof error === 'object' && error !== null && 'message' in error ? String((error as Record<string, unknown>).message) : 'An error occurred') : null;
 
   const filtered = shows.filter((show: Show) => {
     const matchesSearch = (show.name || "").toLowerCase().includes(search.toLowerCase());
@@ -59,7 +60,7 @@ const TVShowsClient: FC<TVShowsClientProps> = ({ initialShows = [], genres = { t
           <p className="text-[#a2cbf9]">
             {isLoading ? "Loading..." : `${shows.length} shows available`}
           </p>
-          {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
+          {errorMessage && <p className="text-red-400 text-sm mt-1">{errorMessage}</p>}
 
           <SearchBar value={search} onChange={(v) => setSearch(v)} />
         </div>

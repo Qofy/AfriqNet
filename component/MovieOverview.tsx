@@ -1,4 +1,16 @@
-export const MovieOverview = ({ movie }) => {
+import { FC } from "react";
+
+interface Movie {
+  overview?: string;
+  genre_ids?: (string | number)[];
+  [key: string]: unknown;
+}
+
+interface MovieOverviewProps {
+  movie: Movie;
+}
+
+export const MovieOverview: FC<MovieOverviewProps> = ({ movie }) => {
   return (
     <div className="space-y-8">
       {/* Overview Section */}

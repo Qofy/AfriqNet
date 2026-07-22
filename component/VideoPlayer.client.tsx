@@ -7,6 +7,8 @@ clearResumeNotice, setIsFullscreen,setErrorMessage,clearErrorMessage,setNowTick,
 setLoading,setError
 } from '@/features/videoPlayerSlice'
 import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { fetchProgressApi, saveProgressApi } from "@/features/videoPlayerSlice";
 
 interface VideoPlayerProps {
   src: string;
@@ -25,7 +27,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ src, autoplay = false, className = 
   const {
     playing,showOverlay,currentTime,duration,lastSaved, resumeNotice,
     isFullscreen,errorMessage,nowTick
-  } = useSelector((store) => store.videoplayer)
+  } = useSelector((state: RootState) => state.videoplayer)
 
   //seting overlay for autoplay
 useEffect(()=>{
@@ -43,15 +45,16 @@ useEffect(()=>{
 }, [lastSaved, dispatch]);
 
 //helper for sender progress
-const postProgress = useCallback(async(position, dur)=>{
+const postProgress = useCallback(async(position: number, dur: number | null): Promise<void> => {
   if (!contentId) return;
 
   dispatch(setLoading(true));
   try{
-    await saveProgress(contentId, position,dur);
+    await saveProgressApi({ contentId, position, duration: dur });
     dispatch(setLastSaved(Date.now()));
-  }catch(error){
-    dispatch(setError(error.message));
+  }catch(error: unknown){
+    const errorMessage = error instanceof Error ? error.message : 'Failed to save progress';
+    dispatch(setError(errorMessage));
   }finally{
     dispatch(setLoading(false));
   }
@@ -108,24 +111,27 @@ useEffect(()=>{
   async function loadProgress() {
     dispatch(setLoading(true));
     try{
-      const data = await fetchProgress(contentId);
+      const data = await fetchProgressApi(contentId as string);
       if(data && !cancelled && data.position > 0){
-        const onLoaded =()=>{
+        const onLoaded = (): void => {
           try{
-            video.currentTime = Math.min(data.position, video.duration || data.position);
+            if (video) {
+              video.currentTime = Math.min(data.position, video.duration || data.position);
+            }
             dispatch(setResumeNotice(data.position));
             setTimeout(()=>dispatch(clearResumeNotice()), 3000);
           }catch{}
-          video.removeEventListener('loadedmetadata', onLoaded);
+          if (video) video.removeEventListener('loadedmetadata', onLoaded);
         };
-        if(video.readyState >= 1){
+        if(video && video.readyState >= 1){
           try{ video.currentTime = Math.min(data.position, video.duration || data.position); }catch{}
-        } else {
+        } else if(video) {
           video.addEventListener('loadedmetadata', onLoaded);
         }
       }
-    }catch(err){
-      dispatch(setError(err.message));
+    }catch(err: unknown){
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load progress';
+      dispatch(setError(errorMessage));
     }finally{
       dispatch(setLoading(false));
     }
@@ -173,28 +179,29 @@ useEffect(()=>{
   }
 },[autoplay,contentId, postProgress,dispatch]);
 
-function togglePlay(e){
+const togglePlay = (e?: React.MouseEvent | React.PointerEvent): void => {
   e?.preventDefault();
-  const video=videoRef.current;
-  if(!video)return;
+  const video = videoRef.current;
+  if(!video) return;
   if(video.paused){
     const p = video.play();
     if(p && typeof p.then === 'function'){
-      p.catch((err)=>{
+      p.catch((err: unknown) => {
         console.error('Play Failed', err);
         dispatch(setErrorMessage('Unable to start playback. Tap play to try again.'));
       });
     }
-  }else{
+  } else {
     video.pause();
   }
-}
-  function formatTime(s) {
-    if (!s || isNaN(s) || !isFinite(s)) return "0:00";
-    const sec = Math.floor(s % 60).toString().padStart(2, '0');
-    const min = Math.floor(s / 60);
-    return `${min}:${sec}`;
-  }
+};
+
+const formatTime = (s: number): string => {
+  if (!s || isNaN(s) || !isFinite(s)) return "0:00";
+  const sec = Math.floor(s % 60).toString().padStart(2, '0');
+  const min = Math.floor(s / 60);
+  return `${min}:${sec}`;
+};
 
   const lastSavedLabel = useMemo(() => {
     if (!lastSaved) return null;
@@ -206,25 +213,25 @@ function togglePlay(e){
     return `${m}m ago`;
   }, [lastSaved, nowTick]);
 
-  function onSeekChange(e) {
+  const onSeekChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const val = Number(e.target.value);
     const video = videoRef.current;
     if (!video || isNaN(val)) return;
     dispatch(setCurrentTime(val));
     video.currentTime = val;
-  }
+  };
 
-  function onSeekPointerDown() {
+  const onSeekPointerDown = (): void => {
     dispatch(setShowOverlay(true));
-  }
+  };
 
-  function onSeekPointerUp() {
+  const onSeekPointerUp = (): void => {
     const video = videoRef.current;
     if (!video) return;
     postProgress(video.currentTime || 0, video.duration || null);
-  }
+  };
 
-  async function toggleFullscreen() {
+  const toggleFullscreen = async (): Promise<void> => {
     try {
       if (!document.fullscreenElement) {
         const el = containerRef.current || videoRef.current;
@@ -235,7 +242,7 @@ function togglePlay(e){
         if (document.exitFullscreen) await document.exitFullscreen();
       }
     } catch {}
-  }
+  };
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>

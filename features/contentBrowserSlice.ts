@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery, useQueryClient } from 'react-query';
 import axios from 'axios';
+import type { RootState } from '../store';
 
 interface Content {
   [key: string]: unknown;
@@ -129,9 +130,9 @@ export const {
 
 export default contentBrowserSlice.reducer;
 
-export function useMovies(page = 1) {
+export function useMovies(page: number = 1) {
   const dispatch = useDispatch();
-  const movies = useSelector((state) => state.contentBrowser.movies);
+  const movies = useSelector((state: RootState) => state.contentBrowser.movies);
 
   return useQuery({
     queryKey: ['movies', page],
@@ -145,15 +146,16 @@ export function useMovies(page = 1) {
       }
       dispatch(setCurrentPage({ contentType: 'movies', page }));
     },
-    onError: (err) => {
-      dispatch(setError(err?.response?.data?.error || err.message));
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : (err as any)?.response?.data?.error || 'An error occurred';
+      dispatch(setError(errorMessage));
     },
   });
 }
 
-export function useTvShows(page = 1) {
+export function useTvShows(page: number = 1) {
   const dispatch = useDispatch();
-  const tvShows = useSelector((state) => state.contentBrowser.tvShows);
+  const tvShows = useSelector((state: RootState) => state.contentBrowser.tvShows);
 
   return useQuery({
     queryKey: ['tvShows', page],
@@ -167,15 +169,16 @@ export function useTvShows(page = 1) {
       }
       dispatch(setCurrentPage({ contentType: 'tvShows', page }));
     },
-    onError: (err) => {
-      dispatch(setError(err?.response?.data?.error || err.message));
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : (err as any)?.response?.data?.error || 'An error occurred';
+      dispatch(setError(errorMessage));
     },
   });
 }
 
-export function useMusicVideos(page = 1) {
+export function useMusicVideos(page: number = 1) {
   const dispatch = useDispatch();
-  const musicVideos = useSelector((state) => state.contentBrowser.musicVideos);
+  const musicVideos = useSelector((state: RootState) => state.contentBrowser.musicVideos);
 
   return useQuery({
     queryKey: ['musicVideos', page],
@@ -189,15 +192,16 @@ export function useMusicVideos(page = 1) {
       }
       dispatch(setCurrentPage({ contentType: 'musicVideos', page }));
     },
-    onError: (err) => {
-      dispatch(setError(err?.response?.data?.error || err.message));
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : (err as any)?.response?.data?.error || 'An error occurred';
+      dispatch(setError(errorMessage));
     },
   });
 }
 
-export function useSearchContent(query, contentType = 'all') {
+export function useSearchContent(query: string, contentType: string = 'all') {
   const dispatch = useDispatch();
-  const searchResults = useSelector((state) => state.contentBrowser.searchResults);
+  const searchResults = useSelector((state: RootState) => state.contentBrowser.searchResults);
 
   return useQuery({
     queryKey: ['search', query, contentType],
@@ -209,8 +213,9 @@ export function useSearchContent(query, contentType = 'all') {
       dispatch(setSearchQuery(query));
       dispatch(setSearchContentType(contentType));
     },
-    onError: (err) => {
-      dispatch(setError(err?.response?.data?.error || err.message));
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : (err as any)?.response?.data?.error || 'An error occurred';
+      dispatch(setError(errorMessage));
     },
   });
 }

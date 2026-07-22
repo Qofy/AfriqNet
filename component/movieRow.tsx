@@ -1,6 +1,18 @@
+import { FC } from "react";
 import MovieCardWithTrailer from "./MovieCardWithTrailer.client";
 
-export const MovieRow = ({ title, movies, showSeeAll = true }) => (
+interface Movie {
+  id: string | number;
+  [key: string]: unknown;
+}
+
+interface MovieRowProps {
+  title: string;
+  movies: Movie[];
+  showSeeAll?: boolean;
+}
+
+export const MovieRow: FC<MovieRowProps> = ({ title, movies, showSeeAll = true }) => (
   <div className="py-4 sm:py-6 px-3 sm:px-6">
     <div className="container mx-auto max-w-7xl">
       <div className="flex items-center justify-between mb-3 sm:mb-4">

@@ -2,8 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { hashUserPassword, verifyPassword } from "../lib/hashpassword";
-import { createUsers } from "../lib/users";
-import getUserByEmailWrapper from "../lib/users";
+import { createUsers, getUserByEmailWrapper } from "../lib/users";
 import destorySession, { createAuthSession } from "../lib/auth";
 
 interface ErrorState {
@@ -83,7 +82,7 @@ export async function signup(prevState: unknown, formData: FormData): Promise<Si
 
     try {
         const user = await createUsers(users_name, email, hashPassword);
-        await createAuthSession(user.id);
+        await createAuthSession(user.id as string);
     } catch (error) {
         const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
         console.error("Signup error:", error);
@@ -113,7 +112,7 @@ export async function signin(prevState: unknown, formData: FormData): Promise<Si
             }
         };
     }
-    const isValidPassword = await verifyPassword(loginExsistingUser.password, password);
+    const isValidPassword = await verifyPassword(loginExsistingUser.password as string, password);
     if (!isValidPassword) {
         return {
             errors: {
@@ -121,7 +120,7 @@ export async function signin(prevState: unknown, formData: FormData): Promise<Si
             }
         };
     }
-    await createAuthSession(loginExsistingUser.id);
+    await createAuthSession(loginExsistingUser.id as string);
     redirect("/home");
 }
 

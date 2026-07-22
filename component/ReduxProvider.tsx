@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, FC, ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { store } from '../store';
 
-export default function ReduxProvider({ children }) {
+interface ReduxProviderProps {
+  children: ReactNode;
+}
+
+const ReduxProvider: FC<ReduxProviderProps> = ({ children }) => {
   // useState ensures a single QueryClient instance per component lifecycle
   const [queryClient] = useState(() => new QueryClient());
 
@@ -16,4 +20,6 @@ export default function ReduxProvider({ children }) {
       </QueryClientProvider>
     </Provider>
   );
-}
+};
+
+export default ReduxProvider;

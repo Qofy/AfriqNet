@@ -8,6 +8,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 export default function SignUpPage() {
   const [formState, formAction] = useActionState(signup, { errors: { name: "", email: "", password: "", confirm_password: "", general: "" } });
+  const errors = formState?.errors ?? { name: "", email: "", password: "", confirm_password: "", general: "" };
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   // const [errors, setErrors] = useState({});
@@ -109,13 +110,13 @@ export default function SignUpPage() {
                   id="name"
                   name="name"
                   className={`w-full bg-white/10 border ${
-                    formState.errors?.name ? "border-red-500" : "border-white/20"
+                    errors?.name ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="John Doe"
                 />
               </div>
-              {formState.errors?.name && (
-                <p className="text-red-500 text-sm mt-1">{formState.errors.name}</p>
+              {errors?.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
               )}
             </div>
 
@@ -131,13 +132,13 @@ export default function SignUpPage() {
                   id="email"
                   name="email"
                   className={`w-full bg-white/10 border ${
-                    formState.errors?.email ? "border-red-500" : "border-white/20"
+                    errors?.email ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="you@example.com"
                 />
               </div>
-              {formState.errors?.email && (
-                <p className="text-red-500 text-sm mt-1">{formState.errors.email}</p>
+              {errors?.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
               )}
             </div>
 
@@ -153,7 +154,7 @@ export default function SignUpPage() {
                   id="password"
                   name="password"
                   className={`w-full bg-white/10 border ${
-                    formState.errors?.password ? "border-red-500" : "border-white/20"
+                    errors?.password ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="••••••••"
                 />
@@ -165,8 +166,8 @@ export default function SignUpPage() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {formState.errors?.password && (
-                <p className="text-red-500 text-sm mt-1">{formState.errors.password}</p>
+              {errors?.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
             </div>
 
@@ -182,7 +183,7 @@ export default function SignUpPage() {
                   id="confirmPassword"
                   name="confirmPassword"
                   className={`w-full bg-white/10 border ${
-                    formState.errors?.confirm_password ? "border-red-500" : "border-white/20"
+                    errors?.confirm_password ? "border-red-500" : "border-white/20"
                   } rounded-lg px-12 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#006eeb] transition-colors`}
                   placeholder="••••••••"
                 />
@@ -194,12 +195,12 @@ export default function SignUpPage() {
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {formState.errors?.confirm_password && (
-                <p className="text-red-500 text-sm mt-1">{formState.errors.confirm_password}</p>
+              {errors?.confirm_password && (
+                <p className="text-red-500 text-sm mt-1">{errors.confirm_password}</p>
               )}
             </div>
-              {formState.errors?.general && (
-                <p className="text-red-500 text-sm mt-4 p-3 bg-red-500/10 rounded-lg">{formState.errors.general}</p>
+              {errors?.general && (
+                <p className="text-red-500 text-sm mt-4 p-3 bg-red-500/10 rounded-lg">{errors.general}</p>
               )}
             {/* Submit Button */}
             <button

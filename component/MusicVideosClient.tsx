@@ -41,7 +41,8 @@ const MusicVideosClient: FC<MusicVideosClientProps> = ({ initialVideos = [], gen
   const [activeGenre, setActiveGenre] = useState(initialGenre);
 
   const { data: videosData = [], isLoading, error } = useMusicVideos(page);
-  const videos = videosData.length > 0 ? videosData : initialVideos;
+  const videos = videosData.length > 0 ? (videosData as Video[]) : initialVideos;
+  const errorMessage = error ? (typeof error === 'string' ? error : typeof error === 'object' && error !== null && 'message' in error ? String((error as Record<string, unknown>).message) : 'An error occurred') : null;
 
   const filtered = videos.filter((video: Video) => {
     const title = video.title || "";
@@ -64,7 +65,7 @@ const MusicVideosClient: FC<MusicVideosClientProps> = ({ initialVideos = [], gen
           <p className="text-[#a2cbf9]">
             {isLoading ? "Loading..." : `${videos.length} videos available`}
           </p>
-          {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
+          {errorMessage && <p className="text-red-400 text-sm mt-1">{errorMessage}</p>}
 
           {/* Search */}
           <div className="mt-4">

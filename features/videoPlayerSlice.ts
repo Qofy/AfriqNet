@@ -9,7 +9,7 @@ interface VideoPlayerState {
   currentTime: number;
   duration: number;
   lastSaved: number | null;
-  resumeNotice: string | null;
+  resumeNotice: number | null;
   isFullscreen: boolean;
   errorMessage: string | null;
   nowTick: number;
@@ -54,7 +54,7 @@ const videoPlayerSlice = createSlice({
         setLastSaved(state, action: PayloadAction<number | null>) {
             state.lastSaved = action.payload;
         },
-        setResumeNotice(state, action: PayloadAction<string | null>) {
+        setResumeNotice(state, action: PayloadAction<number | null>) {
             state.resumeNotice = action.payload;
         },
         clearResumeNotice(state) {
@@ -113,7 +113,12 @@ export const {
 } = videoPlayerSlice.actions;
 
 
-const fetchProgressApi = async (contentId) => {
+interface ProgressData {
+  position: number;
+  duration: number;
+}
+
+export const fetchProgressApi = async (contentId: string): Promise<ProgressData | null> => {
   const { data } = await axios.get(
     `/api/progress?contentId=${encodeURIComponent(contentId)}`
   );
@@ -126,7 +131,13 @@ const fetchProgressApi = async (contentId) => {
   return null;
 };
 
-const saveProgressApi = async ({ contentId, position, duration }) => {
+interface SaveProgressParams {
+  contentId: string;
+  position: number;
+  duration: number | null;
+}
+
+export const saveProgressApi = async ({ contentId, position, duration }: SaveProgressParams): Promise<{ success: boolean }> => {
   if (
     typeof navigator !== "undefined" &&
     typeof navigator.sendBeacon === "function"
@@ -155,7 +166,7 @@ const saveProgressApi = async ({ contentId, position, duration }) => {
  * Usage (inside VideoPlayer):
  *   const { data, isLoading } = useProgressQuery(contentId);
  */
-export function useProgressQuery(contentId) {
+export function useProgressQuery(contentId: string) {
   const dispatch = useDispatch();
 
   return useQuery({
@@ -163,13 +174,14 @@ export function useProgressQuery(contentId) {
     queryFn: () => fetchProgressApi(contentId),
     enabled: !!contentId,          
     staleTime: Infinity,          
-    onSuccess: (data) => {
-      if (data?.position > 0) {
+    onSuccess: (data: ProgressData | null) => {
+      if (data && data.position > 0) {
         dispatch(setResumeNotice(data.position));
       }
     },
-    onError: (err) => {
-      dispatch(setError(err?.response?.data?.error || err.message));
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : (err as any)?.response?.data?.error || 'An error occurred';
+      dispatch(setError(errorMessage));
     },
   });
 }
@@ -193,14 +205,15 @@ export function useSaveProgress() {
       dispatch(setLastSaved(Date.now()));
       queryClient.invalidateQueries({ queryKey: ["progress", variables.contentId] });
     },
-    onError: (err) => {
-      dispatch(setError(err?.response?.data?.error || err.message));
+    onError: (err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : (err as any)?.response?.data?.error || 'An error occurred';
+      dispatch(setError(errorMessage));
     },
   });
 
   return {
     saveProgress: mutation.mutate,
-    isLoading: mutation.isPending,
+    isLoading: (mutation as any).isLoading || false,
   };
 }
 

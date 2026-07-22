@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import MusicVideosClient from "@/component/MusicVideosClient";
 import { getAllGenres, getAllMusicVideos } from "../../../lib/db.server";
 
@@ -37,5 +38,9 @@ export default function MusicVideosPage() {
     throw new Error("Loading music videos failed. Please try again later.");
   }
 
-  return <MusicVideosClient initialVideos={videos} genres={genres} />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MusicVideosClient initialVideos={videos} genres={genres} />
+    </Suspense>
+  );
 }
